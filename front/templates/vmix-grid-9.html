@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', path='/main.css') }}">
+
+    <script src="https://kit.fontawesome.com/777c0d9c62.js" crossorigin="anonymous"></script>
+    <!-- <script src="{{ url_for('static', path='/fontawesome/js/all.min.js') }}" crossorigin="anonymous"></script> -->
+    
+    <title>VmixGridWatcher</title>
+</head>
+<body>
+    <div class = "grid-col">
+        {% for id, name in vmixes.items() %}
+            <div class="cell" id="{{ id }}">
+                <span class="studio-name">{{ name }}</span>
+                <div class="state">
+                    <span class="recording grey"><i class="fa-solid fa-hard-drive"></i><span>Rec</span></span>
+                    <span class="streaming grey"><i class="fa-solid fa-tower-cell"></i><span>Stream</span></span>
+                    <span class="online grey"><i class="fa-brands fa-youtube"></i><span>Online</span></span>
+                    <span class="speaker grey"><i class="fa-solid fa-microphone"></i><span class="speaker-name"></span></span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <script src="{{ url_for('static', path='/main.js') }}"></script>
+</body>
+</html>
