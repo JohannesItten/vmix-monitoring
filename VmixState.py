@@ -33,7 +33,10 @@ class VmixState:
                 "online": False,
                 "recording": False,
                 "streaming": False,
-                "speaker": None
+                "streaming_channels": [],
+                "speaker": None,
+                "master": {"state": False, "volume": 0},
+                "busA": {"state": False, "volume": 0}
             }
         # check is input with zast_key in program
         # check current speaker in pgm
@@ -44,10 +47,10 @@ class VmixState:
         speaker_name = None
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
-            if input_title.find("zastkey") >= 0:
+            if input_title.find(zast_key) >= 0:
                 if input["@number"] != pgm_input:
                     current_state["online"] = True
-            elif input_title.find("speakerkey") >= 0:
+            elif input_title.find(speaker_key) >= 0:
                 speaker_input_num = input["@number"]
                 speaker_name = input["text"][0]["#text"]
                 if input["@number"] == pgm_input:
@@ -59,15 +62,27 @@ class VmixState:
                 if "#text" in overlay and overlay["#text"] == speaker_input_num:
                     current_state["speaker"] = speaker_name
         
-        #check is streaming
-        current_state["streaming"] = eval(json_state["streaming"])
-        
-        #check is rec
+        #check is recording
         if "#text" in json_state["recording"]:
             current_state["recording"] = eval(json_state["recording"]["#text"])
         else:
             current_state["recording"] = eval(json_state["recording"])
-                    
+            
+        #check is streaming
+        if "#text" in json_state["streaming"]:
+            current_state["streaming"] = eval(json_state["streaming"]["#text"])
+            streaming = json_state["streaming"]
+            current_state["streaming_channels"] = [key[-1:] for key in streaming if key in ["@channel1", "@channel2", "@channel3"]]
+        else:
+            current_state["streaming"] = eval(json_state["streaming"])
+            
+        #audio buses
+        for bus_name in json_state["audio"]:
+            if bus_name in ["master", "busA"]:
+                bus_state = json_state["audio"][bus_name]
+                current_state[bus_name] = {"state": not eval(bus_state["@muted"]), 
+                                           "volume": int(bus_state["@volume"])}
+                                            
         if current_state != self.state:
             self.is_changed = True
             self.level = VmixState.INFO

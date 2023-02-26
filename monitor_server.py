@@ -55,6 +55,7 @@ async def process_api_response(vmix_id, response):
         vmix_states[vmix_id] = state
         await send_state(vmix_id, state.level, state.state)
 
+
 async def get_api_response(vmix_id, ip, session):
     try:
         url = "http://{}:8088/api".format(ip)

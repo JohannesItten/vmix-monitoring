@@ -1,0 +1,7 @@
+websockets
+fastapi
+jinja2
+uvicorn[standard]
+xmltodict
+aiohttp
+asyncio
