@@ -1,4 +1,5 @@
 import hashlib
+from pickle import NONE
 import xmltodict
 
 
@@ -36,32 +37,53 @@ class VmixState:
                 "streaming_channels": [],
                 "speaker": None,
                 "master": {"state": False, "volume": 0},
-                "busA": {"state": False, "volume": 0}
+                "audio": {"muted": True, "volume": 0}
             }
-        # check is input with zast_key in program
-        # check current speaker in pgm
-        pgm_input = json_state["active"]
+        # find input nums with zast_key in title
+        # find key's of title inputs
+        pgm_input = None
+        pgm_input_num = json_state["active"]
         zast_key = "zastkey"
         speaker_key = "speakerkey"
-        speaker_input_num = None
-        speaker_name = None
+        speaker_inputs = {}
+        zast_input_nums = []
+
+        audio_in_key = "audiokey"
+        audio_inputs = []
+        
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
+            input_num = input["@number"]
+            
+            if input_num == pgm_input_num:
+                pgm_input = input
+
             if input_title.find(zast_key) >= 0:
-                if input["@number"] != pgm_input:
-                    current_state["online"] = True
+                zast_input_nums.append(input_num)
             elif input_title.find(speaker_key) >= 0:
-                speaker_input_num = input["@number"]
-                speaker_name = input["text"][0]["#text"]
-                if input["@number"] == pgm_input:
-                    current_state["speaker"] = speaker_name
-        
-        #check speaker in overlay
-        if speaker_input_num is not None:
-            for overlay in json_state["overlays"]["overlay"]:
-                if "#text" in overlay and overlay["#text"] == speaker_input_num:
-                    current_state["speaker"] = speaker_name
-        
+                speaker_inputs[input["@key"]] = input
+            elif input_title.find(audio_in_key) >= 0:
+                audio_inputs.append(input)
+
+        #check is input with zast_key in pgm
+        if pgm_input_num not in zast_input_nums:
+            current_state["online"] = True
+       
+        #check pgm input for title multiview overlay
+        if pgm_input and "overlay" in pgm_input:
+            for overlay in pgm_input["overlay"]:
+                key = overlay["@key"]
+                if overlay["@key"] in speaker_inputs.keys():
+                    speaker = speaker_inputs[key]
+                    speaker_name = speaker["text"]["#text"]
+                    name = speaker_name.split(" ")
+                    if speaker_name and len(name) == 3:
+                        name = speaker_name.split(" ")
+                        current_state["speaker"] = f"{name[0]} {name[1][0]}. {name[2][0]}."
+                    else:
+                        current_state["speaker"] = speaker_name
+
+
         #check is recording
         if "#text" in json_state["recording"]:
             current_state["recording"] = eval(json_state["recording"]["#text"])
@@ -75,13 +97,31 @@ class VmixState:
             current_state["streaming_channels"] = [key[-1:] for key in streaming if key in ["@channel1", "@channel2", "@channel3"]]
         else:
             current_state["streaming"] = eval(json_state["streaming"])
-            
+        
+        #audio inputs
+        for input in audio_inputs:
+            state = not eval(input["@muted"])
+            volume = round(float(input["@volume"]))
+            if volume < 40:
+                state = False
+            current_state["audio"] = {
+                    "state": state,
+                    "volume": volume
+                    }
+
         #audio buses
         for bus_name in json_state["audio"]:
-            if bus_name in ["master", "busA"]:
+            if bus_name in ["master"]:
                 bus_state = json_state["audio"][bus_name]
-                current_state[bus_name] = {"state": not eval(bus_state["@muted"]), 
-                                           "volume": int(bus_state["@volume"])}
+                state = not eval(bus_state["@muted"])
+                volume = round(float(bus_state["@volume"]))
+                print(f"master {volume}")
+                if volume < 40:
+                    state = False
+                current_state[bus_name] = {
+                        "state": state, 
+                        "volume": volume
+                        }
                                             
         if current_state != self.state:
             self.is_changed = True

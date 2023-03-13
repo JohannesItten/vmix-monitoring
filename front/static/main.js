@@ -36,6 +36,7 @@ function switchBooleanPropertyState(stateElem, propertyClass, propertyValue, typ
         case "audio":
             enabledState = STATE_AUDIO_ENADLED;
             disabledState = STATE_AUDIO_DISABLED;
+            break;
         default:
             enabledState = STATE_INFO;
             disabledState = STATE_INFO;
@@ -44,6 +45,16 @@ function switchBooleanPropertyState(stateElem, propertyClass, propertyValue, typ
 
     propertyElem.classList.remove("red", "grey", "green");
     propertyValue ? propertyElem.classList.add(enabledState) : propertyElem.classList.add(disabledState);
+}
+
+function updateVolume(stateElem, propertyClass, volume)
+{
+    propertyElem = stateElem.querySelector("." + propertyClass);
+    if (propertyElem == null) { return; }
+
+    volElem = propertyElem.querySelector(".volume");
+    if (volElem == null) { return; }
+    volElem.innerHTML = volume;
 }
 
 function processState(vmix_id, state)
@@ -57,6 +68,12 @@ function processState(vmix_id, state)
     switchBooleanPropertyState(stateElement, "recording", state.recording);
     switchBooleanPropertyState(stateElement, "streaming", state.streaming);
     
+    //process audio
+    switchBooleanPropertyState(stateElement, "master", state.master.state, "audio");
+    switchBooleanPropertyState(stateElement, "audio", state.audio.state, "audio");
+    updateVolume(stateElement, "master", state.master.volume);
+    updateVolume(stateElement, "audio", state.audio.volume);
+
     speakerElem = stateElement.querySelector(".speaker-name");
     if (state.speaker != null)
     {

@@ -51,7 +51,7 @@ async def send_state(vmix_id, state_level, state):
 async def process_api_response(vmix_id, response):
     state = vmix_states[vmix_id]
     state.updateState(response)
-    if state.is_changed:
+    if state.is_changed or not state.is_changed:
         vmix_states[vmix_id] = state
         await send_state(vmix_id, state.level, state.state)
 
@@ -91,7 +91,7 @@ if __name__ == "__main__":
         sys.exit(1)
         
     try:
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        #asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\nShutting down server...\n")
