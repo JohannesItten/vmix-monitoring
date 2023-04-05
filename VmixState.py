@@ -37,7 +37,8 @@ class VmixState:
                 "streaming_channels": [],
                 "speaker": None,
                 "master": {"state": False, "volume": 0},
-                "audio": {"muted": True, "volume": 0}
+                "audio": {"muted": True, "volume": 0},
+                "parse_error": {"zast": True, "audio": True, "speaker": True} #error means there vmix preset parse errors  
             }
         # find input nums with zast_key in title
         # find key's of title inputs
@@ -64,6 +65,13 @@ class VmixState:
                 speaker_inputs[input["@key"]] = input
             elif input_title.find(audio_in_key) >= 0:
                 audio_inputs.append(input)
+
+        #check that every needed input is found
+        current_state["parse_error"] = {
+                "zast": len(zast_input_nums) > 0,
+                "audio": len(audio_inputs) > 0,
+                "speaker": len(speaker_inputs) > 0
+                }
 
         #check is input with zast_key in pgm
         if pgm_input_num not in zast_input_nums:
@@ -115,7 +123,6 @@ class VmixState:
                 bus_state = json_state["audio"][bus_name]
                 state = not eval(bus_state["@muted"])
                 volume = round(float(bus_state["@volume"]))
-                print(f"master {volume}")
                 if volume < 40:
                     state = False
                 current_state[bus_name] = {

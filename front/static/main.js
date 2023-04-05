@@ -1,8 +1,19 @@
+//
+// It's a spaghetii, which need to be rewrited as simple state machine
+//
+//
+
 const STATE_MAIN_ENABLED = "red", 
       STATE_MAIN_DISABLED = "grey",
       STATE_AUDIO_ENADLED = "green",
       STATE_AUDIO_DISABLED = "red",
-      STATE_INFO = "grey"
+      STATE_INFO = "grey",
+      STATE_ERROR = "red";
+
+const MODE_CONSTRUCTION = "DEV",
+      MODE_PRODUCTION  = "PROD";
+
+const CURRENT_MODE = MODE_CONSTRUCTION;
 
 const COLOR_CLASSES = ["red", "grey", "green"]
 
@@ -18,8 +29,28 @@ function recieveMessage(websocket)
 {
     websocket.addEventListener("message", ({ data }) => {
         msg = JSON.parse(data);
-        if (!msg.hasOwnProperty("state") || msg.state == null) { return; }
+        if (msg.hasOwnProperty("init"))
+        {
+            processInitResponse(msg["init"]);
+            return;
+        }
+        if (!msg.hasOwnProperty("state")) { return; }
+        if (!msg.state)
+        {
+            processError(msg["id"], msg["satte"]);
+            return;
+        }
         processState(msg["id"], msg["state"]);
+        processError(msg["id"], msg["state"]);
+    });
+}
+
+function processInitResponse(msg)
+{
+    Object.keys(msg).forEach(id => {
+        state = JSON.parse(msg[id]);
+        processState(id, state["state"]);
+        processError(id, state["state"]);
     });
 }
 
@@ -47,6 +78,12 @@ function switchBooleanPropertyState(stateElem, propertyClass, propertyValue, typ
     propertyValue ? propertyElem.classList.add(enabledState) : propertyElem.classList.add(disabledState);
 }
 
+function switchElemColorState(elem, state)
+{
+    elem.classList.remove("red", "grey", "green");
+    elem.classList.add(state);
+}
+
 function updateVolume(stateElem, propertyClass, volume)
 {
     propertyElem = stateElem.querySelector("." + propertyClass);
@@ -57,8 +94,63 @@ function updateVolume(stateElem, propertyClass, volume)
     volElem.innerHTML = volume;
 }
 
+function processError(vmix_id, state)
+{
+    stateElement = document.getElementById(vmix_id);
+    if (!stateElement) { return; }
+
+    errorElement = stateElement.querySelector(".error");
+    errorDescElement = stateElement.querySelector(".error-description");
+    if (!errorElement || !errorDescElement) { return; }
+
+    if (state == null)
+    {
+        errorDescElement.innerHTML = "Unreachable";
+        switchElemColorState(errorElement, STATE_ERROR);
+        return;
+    }
+
+    let errors = []
+    //Process preset parse errors
+    Object.keys(state.parse_error).forEach(key => {
+        if (!state.parse_error[key]){
+            errors.push({"level": 1, "reason": "Пресет не готов"});
+        }
+    });
+
+    //Process stream/rec/in air errors
+    if (state.online && state.streaming)
+    {
+        if (!state.recording) { errors.push({"level": 2, "reason": "Запись начата позже эфира!"}); }
+    }
+    
+    maxErrorLevel = 0;
+    mainReason = "";
+
+    errors.forEach(err => {
+        if (err.level > maxErrorLevel)
+        {
+            maxErrorLevel = err.level;
+            mainReason = err.reason;
+        }
+    });
+    
+    errorDescElement.innerHTML = mainReason;
+    switch(maxErrorLevel)
+    {
+        case 0:
+        case 1:
+            switchElemColorState(errorElement, STATE_INFO);
+            break;
+        default:
+            switchElemColorState(errorElement, STATE_ERROR);
+    }
+}
+
 function processState(vmix_id, state)
 {
+    if (!state) { return; }
+    
     stateElement = document.getElementById(vmix_id);
     if (!stateElement) { return; }
     //update Online state
@@ -81,9 +173,8 @@ function processState(vmix_id, state)
     }
     else
     {
-        speakerElem.innerHTML = "";
+        speakerElem.innerHTML = "?";
     }
-     
 }
 
 window.addEventListener("DOMContentLoaded", () => {

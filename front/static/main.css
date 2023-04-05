@@ -34,14 +34,35 @@ div.cell
     box-shadow: 0 0 0 1px white inset;
 }
 
-.studio-name
+.top-bar
 {
-    position: relative;
-    display: block;
-    top: 0;
-    left: 79%;
+}
 
-    background-color: lightgray;
+.top-bar .error
+{
+    display: inline-block;
+    width: 77%;
+    text-align: center;
+
+    border-radius: 5px;
+    margin: 5px 0 0 5px;
+}
+
+.error .error-description
+{
+    display: inline-block;
+    width: 95%;
+    text-align: left;
+}
+
+.top-bar .studio-name
+{
+    /* position: relative; */
+    display: inline-block;
+    /* top: 0; */
+    /* left: 60%; */
+
+    /* background-color: ligh tgray; */
     /* opacity: 50%; */
     width: 20%;
     text-align: center;
@@ -61,11 +82,34 @@ div.cell
 
 .state span
 {
+    display: inline-block;
+    height: 25px;
+    line-height: 25px;
     padding: 0px 5px 0px 5px;
     font-weight: normal;
     border-radius: 5px;
-    height: 25px;
     text-align: center;
+}
+
+.state .speaker-name
+{   
+    white-space: nowrap;
+    /* overflow: hidden; */
+    text-overflow: ellipsis;
+    min-width: 153px;
+    max-width: 153px;
+}
+
+.state .master
+{
+    min-width: 76px;
+    max-width: 76px;
+}
+
+.state .audio
+{
+    min-width: 93px;
+    max-width: 93px;
 }
 
 .redAlpha

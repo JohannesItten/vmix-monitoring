@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', path='/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='font-awesome/css/font-awesome.min.css') }}">
+    <!-- <script src="https://kit.fontawesome.com/777c0d9c62.js" crossorigin="anonymous"></script> -->
+    <!-- <script src="{{ url_for('static', path='/fontawesome/js/all.min.js') }}" crossorigin="anonymous"></script> -->
+    
+    <title>VmixGridWatcher</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/img/favicon.png')}}">
+</head>
+<body>
+    <div class = "grid-col">
+        {% if vmixes.items()|length == 0 %}
+        <img src="{{ url_for('static', path='/img/rickroll.gif') }}"></img>
+        {% endif %}
+        
+        {% for id, name in vmixes.items() %}
+            <div class="cell" id="{{ id }}">
+                <div class="top-bar">
+                    <span class="error grey">
+                        <i class="fa fa-info" aria-hidden="true"></i>
+                        <span class="error-description"></span>
+                    </span>
+                    <span class="studio-name grey">{{ name }}</span>
+                </div>
+                <div class="state">
+                    <span class="recording grey"><i class="fa fa-hdd-o" aria-hidden="true"></i><span>Rec</span></span>
+                    <span class="streaming grey"><i class="fa fa-youtube-play" aria-hidden="true"></i><span>Stream</span></span>
+                    <span class="online grey"><i class="fa fa-power-off" aria-hidden="true"></i><span>Online</span></span>
+                    <span class="speaker grey"><i class="fa fa-microphone" aria-hidden="true"></i><span class="speaker-name">?</span></span>
+                    <span class="master red"><i class="fa fa-bus" aria-hidden="true"></i><span>M</span><span class="volume">100</span></span>
+                    <span class="audio red"><i class="fa fa-volume-up" aria-hidden="true"></i><span>MIC</span><span class="volume">100</span></span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <script src="{{ url_for('static', path='/main.js') }}"></script>
+</body>
+</html>
+
+

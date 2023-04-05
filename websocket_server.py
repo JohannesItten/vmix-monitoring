@@ -9,6 +9,8 @@ from signal import signal, SIGINT, SIGTERM
 
 watchers = set()
 
+#TODO: store states in db. Also check broadcast_to_watchers
+vmix_states = {}
 
 def exit_handler(signal_recieved, frame):
     print("\nShutting down server...\n")
@@ -17,11 +19,14 @@ def exit_handler(signal_recieved, frame):
 
 async def watch(websocket):
     watchers.add(websocket)
-    await websocket.send(json.dumps("Hello!"))
+    await websocket.send(json.dumps({"init": vmix_states}))
     await asyncio.Event().wait()
 
 
 async def broadcast_to_watchers(message):
+    state = json.loads(message)
+    if "id" in state:
+        vmix_states[state["id"]] = message
     websockets.broadcast(watchers, message)
 
 async def handler(websocket):

@@ -51,7 +51,7 @@ async def send_state(vmix_id, state_level, state):
 async def process_api_response(vmix_id, response):
     state = vmix_states[vmix_id]
     state.updateState(response)
-    if state.is_changed or not state.is_changed:
+    if state.is_changed:
         vmix_states[vmix_id] = state
         await send_state(vmix_id, state.level, state.state)
 
@@ -65,12 +65,16 @@ async def get_api_response(vmix_id, ip, session):
     except aiohttp.ClientConnectorError:
         print("Unresolved: {}".format(ip))
         await send_state(vmix_id, 3, None)
+    except asyncio.TimeoutError:
+        print("Timeout: {}".format(ip))
+        await send_state(vmix_id, 3, None)
 
 
 async def main():
     tasks = []
-    
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=20, connect=1)
+    repeat_every = 1
+    async with aiohttp.ClientSession(timeout=timeout) as session:
         while True:
             time_start = time()
             for state in vmix_states.values():
@@ -80,7 +84,7 @@ async def main():
             await asyncio.gather(*tasks, return_exceptions=True)
             print("\nTime passed:", time() - time_start)
             tasks.clear()
-            await asyncio.sleep(1)
+            await asyncio.sleep(repeat_every)
 
 
 if __name__ == "__main__":
@@ -91,7 +95,6 @@ if __name__ == "__main__":
         sys.exit(1)
         
     try:
-        #asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(main())
     except KeyboardInterrupt:
         print("\nShutting down server...\n")
