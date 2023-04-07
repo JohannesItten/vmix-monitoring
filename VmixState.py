@@ -80,10 +80,11 @@ class VmixState:
         #check pgm input for title multiview overlay
         if pgm_input and "overlay" in pgm_input:
             for overlay in pgm_input["overlay"]:
+                if not "@key" in overlay: break;
                 key = overlay["@key"]
                 if overlay["@key"] in speaker_inputs.keys():
                     speaker = speaker_inputs[key]
-                    speaker_name = speaker["text"]["#text"]
+                    speaker_name = speaker["text"][2]["#text"]
                     name = speaker_name.split(" ")
                     if speaker_name and len(name) == 3:
                         name = speaker_name.split(" ")
@@ -108,6 +109,12 @@ class VmixState:
         
         #audio inputs
         for input in audio_inputs:
+            if "@muted" not in input:
+                current_state["audio"] = {
+                        "state": False,
+                        "volume": "off"
+                        }
+                break
             state = not eval(input["@muted"])
             volume = round(float(input["@volume"]))
             if volume < 40:

@@ -29,6 +29,10 @@ function recieveMessage(websocket)
 {
     websocket.addEventListener("message", ({ data }) => {
         msg = JSON.parse(data);
+        if (msg["id"] == "eb764f6ebabfd7132565a698062be6aa")
+        {
+            console.log(msg);
+        }
         if (msg.hasOwnProperty("init"))
         {
             processInitResponse(msg["init"]);
@@ -121,7 +125,7 @@ function processError(vmix_id, state)
     //Process stream/rec/in air errors
     if (state.online && state.streaming)
     {
-        if (!state.recording) { errors.push({"level": 2, "reason": "Запись начата позже эфира!"}); }
+        if (!state.recording) { errors.push({"level": 2, "reason": "Запись!!!"}); }
     }
     
     maxErrorLevel = 0;

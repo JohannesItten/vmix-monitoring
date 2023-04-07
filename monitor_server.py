@@ -64,15 +64,19 @@ async def get_api_response(vmix_id, ip, session):
             await process_api_response(vmix_id, resp)
     except aiohttp.ClientConnectorError:
         print("Unresolved: {}".format(ip))
+        failed_state = vmix_states[vmix_id]
+        failed_state.state = None
         await send_state(vmix_id, 3, None)
     except asyncio.TimeoutError:
         print("Timeout: {}".format(ip))
+        failed_state = vmix_states[vmix_id]
+        failed_state.state = None
         await send_state(vmix_id, 3, None)
 
 
 async def main():
     tasks = []
-    timeout = aiohttp.ClientTimeout(total=20, connect=1)
+    timeout = aiohttp.ClientTimeout(total=3, connect=1)
     repeat_every = 1
     async with aiohttp.ClientSession(timeout=timeout) as session:
         while True:
@@ -81,7 +85,7 @@ async def main():
                 task = asyncio.create_task(get_api_response(state.id, state.ip, session))
                 tasks.append(task)
         
-            await asyncio.gather(*tasks, return_exceptions=True)
+            await asyncio.gather(*tasks, return_exceptions=False)
             print("\nTime passed:", time() - time_start)
             tasks.clear()
             await asyncio.sleep(repeat_every)
