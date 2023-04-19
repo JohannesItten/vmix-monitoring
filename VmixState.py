@@ -37,8 +37,15 @@ class VmixState:
                 "streaming_channels": [],
                 "speaker": None,
                 "master": {"state": False, "volume": 0},
+                "busA": {"state": False, "volume": 0}, 
                 "audio": {"muted": True, "volume": 0},
-                "parse_error": {"zast": True, "audio": True, "speaker": True} #error means there vmix preset parse errors  
+                "audio_zoom": {"muted": True, "volume": 0},
+                "parse_error": {
+                                "zast": True,
+                                "audio": True,
+                                "zoom": True,
+                                "speaker": True
+                                } #error means there vmix preset parse errors  
             }
         # find input nums with zast_key in title
         # find key's of title inputs
@@ -51,6 +58,9 @@ class VmixState:
 
         audio_in_key = "audiokey"
         audio_inputs = []
+
+        zoom_in_key = "zoomkey"
+        zoom_inputs = []
         
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
@@ -65,12 +75,15 @@ class VmixState:
                 speaker_inputs[input["@key"]] = input
             elif input_title.find(audio_in_key) >= 0:
                 audio_inputs.append(input)
+            elif input_title.find(zoom_in_key) >= 0:
+                zoom_inputs.append(input)
 
         #check that every needed input is found
         current_state["parse_error"] = {
                 "zast": len(zast_input_nums) > 0,
                 "audio": len(audio_inputs) > 0,
-                "speaker": len(speaker_inputs) > 0
+                "audio_zoom": len(zoom_inputs) > 0,
+                "speaker": len(speaker_inputs) > 0,
                 }
 
         #check is input with zast_key in pgm
@@ -84,7 +97,7 @@ class VmixState:
                 key = overlay["@key"]
                 if overlay["@key"] in speaker_inputs.keys():
                     speaker = speaker_inputs[key]
-                    speaker_name = speaker["text"][2]["#text"]
+                    speaker_name = speaker["text"][1]["#text"]
                     name = speaker_name.split(" ")
                     if speaker_name and len(name) == 3:
                         name = speaker_name.split(" ")
@@ -124,9 +137,27 @@ class VmixState:
                     "volume": volume
                     }
 
+        #zoom inputs
+        for input in zoom_inputs:
+            if "@muted" not in input:
+                current_state["audio_zoom"] = {
+                        "state": False,
+                        "volume": "off"
+                        }
+                break
+            state = not eval(input["@muted"])
+            volume = round(float(input["@volume"]))
+            if volume < 40:
+                state = False
+            current_state["audio_zoom"] = {
+                    "state": state,
+                    "volume": volume
+                    }
+
+
         #audio buses
         for bus_name in json_state["audio"]:
-            if bus_name in ["master"]:
+            if bus_name in ["master", "busA"]:
                 bus_state = json_state["audio"][bus_name]
                 state = not eval(bus_state["@muted"])
                 volume = round(float(bus_state["@volume"]))

@@ -41,7 +41,7 @@ div.cell
 .top-bar .error
 {
     display: inline-block;
-    width: 77%;
+    width: 46%;
     text-align: center;
 
     border-radius: 5px;
@@ -51,7 +51,7 @@ div.cell
 .error .error-description
 {
     display: inline-block;
-    width: 95%;
+    width: 93%;
     text-align: left;
 }
 
@@ -69,6 +69,25 @@ div.cell
 
     border-radius: 5px;
     margin: 5px 5px 0 0;
+}
+
+.top-bar .speaker
+{
+    display: inline-block;
+    width: 30%;
+
+    white-space: nowrap;
+    text-align: center;
+    text-overflow: ellipsis;
+
+    border-radius: 5px;
+    margin: 5px 5px 0 0;
+}
+
+.speaker .speaker-name
+{
+    display: inline-block;
+    width: 90%;
 }
 
 .state
@@ -91,14 +110,14 @@ div.cell
     text-align: center;
 }
 
-.state .speaker-name
-{   
-    white-space: nowrap;
-    /* overflow: hidden; */
-    text-overflow: ellipsis;
-    min-width: 153px;
-    max-width: 153px;
-}
+/* .state .speaker-name */
+/* {    */
+/*     white-space: nowrap; */
+/*     /* overflow: hidden; */ */
+/*     text-overflow: ellipsis; */
+/*     min-width: 153px; */
+/*     max-width: 153px; */
+/* } */
 
 .state .master
 {

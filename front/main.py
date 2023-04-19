@@ -27,7 +27,7 @@ async def read_item(request: Request):
     return templates.TemplateResponse("vmix-grid-9.html", {"request": request, "vmixes": vmixes})
 
 
-@app.get("/nrf/", response_class=HTMLResponse)
+@app.get("/cardio/", response_class=HTMLResponse)
 async def get_paged_grid(request: Request, page: int = 1):
     page_amount = 6
     page_vmixes_max = min([len(vmixes), page_amount * page])

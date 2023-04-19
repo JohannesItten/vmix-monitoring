@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import logging
 import sys
 from time import time
 
@@ -42,9 +43,14 @@ def check_params():
     return is_params_ok
     
 
-async def send_state(vmix_id, state_level, state):
+async def send_state(vmix_id, state_level, state, reason=None):
     async with websockets.connect(WS_SERVER_URI) as connect:
-        client_info = {"type": "update", "id": vmix_id, "state_level": state_level, "state": state}
+        client_info = {"type": "update", 
+                       "id": vmix_id,
+                       "state_level": state_level,
+                       "state": state,
+                       "reason": reason
+                       }
         await connect.send(json.dumps(client_info))
 
 
@@ -57,6 +63,7 @@ async def process_api_response(vmix_id, response):
 
 
 async def get_api_response(vmix_id, ip, session):
+    # TODO: rewrite exception's
     try:
         url = "http://{}:8088/api".format(ip)
         async with session.get(url) as response:
@@ -66,12 +73,18 @@ async def get_api_response(vmix_id, ip, session):
         print("Unresolved: {}".format(ip))
         failed_state = vmix_states[vmix_id]
         failed_state.state = None
-        await send_state(vmix_id, 3, None)
+        await send_state(vmix_id, 3, None, reason="Unreachable")
     except asyncio.TimeoutError:
         print("Timeout: {}".format(ip))
         failed_state = vmix_states[vmix_id]
         failed_state.state = None
-        await send_state(vmix_id, 3, None)
+        await send_state(vmix_id, 3, None, reason="Unreachable")
+    except Exception as e:
+        failed_state = vmix_states[vmix_id]
+        failed_state.state = None
+        logging.info(f"Err with {ip}, reason:")
+        logging.error(e, exc_info=True)
+        await send_state(vmix_id, 3, None, reason="Parse error")
 
 
 async def main():
@@ -85,7 +98,7 @@ async def main():
                 task = asyncio.create_task(get_api_response(state.id, state.ip, session))
                 tasks.append(task)
         
-            await asyncio.gather(*tasks, return_exceptions=False)
+            await asyncio.gather(*tasks, return_exceptions=True)
             print("\nTime passed:", time() - time_start)
             tasks.clear()
             await asyncio.sleep(repeat_every)

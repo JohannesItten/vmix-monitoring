@@ -41,11 +41,11 @@ function recieveMessage(websocket)
         if (!msg.hasOwnProperty("state")) { return; }
         if (!msg.state)
         {
-            processError(msg["id"], msg["satte"]);
+            processError(msg["id"], msg["state"], msg["reason"]);
             return;
         }
         processState(msg["id"], msg["state"]);
-        processError(msg["id"], msg["state"]);
+        processError(msg["id"], msg["state"], state["reason"]);
     });
 }
 
@@ -54,7 +54,7 @@ function processInitResponse(msg)
     Object.keys(msg).forEach(id => {
         state = JSON.parse(msg[id]);
         processState(id, state["state"]);
-        processError(id, state["state"]);
+        processError(id, state["state"], state["reason"]);
     });
 }
 
@@ -98,7 +98,7 @@ function updateVolume(stateElem, propertyClass, volume)
     volElem.innerHTML = volume;
 }
 
-function processError(vmix_id, state)
+function processError(vmix_id, state, reason)
 {
     stateElement = document.getElementById(vmix_id);
     if (!stateElement) { return; }
@@ -109,7 +109,7 @@ function processError(vmix_id, state)
 
     if (state == null)
     {
-        errorDescElement.innerHTML = "Unreachable";
+        errorDescElement.innerHTML = reason;
         switchElemColorState(errorElement, STATE_ERROR);
         return;
     }
@@ -118,14 +118,15 @@ function processError(vmix_id, state)
     //Process preset parse errors
     Object.keys(state.parse_error).forEach(key => {
         if (!state.parse_error[key]){
-            errors.push({"level": 1, "reason": "Пресет не готов"});
+            errors.push({"level": 1, "reason": "Пресет: " + key});
         }
     });
 
     //Process stream/rec/in air errors
-    if (state.online && state.streaming)
+    if (state.online)
     {
-        if (!state.recording) { errors.push({"level": 2, "reason": "Запись!!!"}); }
+        if (!state.recording) { errors.push({"level": 2, "reason": "Запись!"}); }
+        if (!state.streaming) { errors.push({"level": 2, "reason": "Стрим!"}); }
     }
     
     maxErrorLevel = 0;
@@ -136,6 +137,10 @@ function processError(vmix_id, state)
         {
             maxErrorLevel = err.level;
             mainReason = err.reason;
+        }
+        else if (err.level == maxErrorLevel)
+        {
+           mainReason += " " + err.reason; 
         }
     });
     
@@ -166,11 +171,16 @@ function processState(vmix_id, state)
     
     //process audio
     switchBooleanPropertyState(stateElement, "master", state.master.state, "audio");
+    switchBooleanPropertyState(stateElement, "busA", state.busA.state, "audio");
     switchBooleanPropertyState(stateElement, "audio", state.audio.state, "audio");
+    switchBooleanPropertyState(stateElement, "zoom", state.audio_zoom.state, "audio");
     updateVolume(stateElement, "master", state.master.volume);
+    updateVolume(stateElement, "busA", state.busA.volume);
     updateVolume(stateElement, "audio", state.audio.volume);
+    updateVolume(stateElement, "zoom", state.audio_zoom.volume);
 
     speakerElem = stateElement.querySelector(".speaker-name");
+    
     if (state.speaker != null)
     {
         speakerElem.innerHTML = state.speaker;
