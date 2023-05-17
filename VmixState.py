@@ -97,7 +97,7 @@ class VmixState:
                 key = overlay["@key"]
                 if overlay["@key"] in speaker_inputs.keys():
                     speaker = speaker_inputs[key]
-                    speaker_name = speaker["text"][1]["#text"]
+                    speaker_name = speaker["text"]["#text"]
                     name = speaker_name.split(" ")
                     if speaker_name and len(name) == 3:
                         name = speaker_name.split(" ")
