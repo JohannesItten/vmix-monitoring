@@ -53,7 +53,7 @@ class VmixState:
         pgm_input_num = json_state["active"]
         zast_key = "zastkey"
         speaker_key = "speakerkey"
-        speaker_inputs = {}
+        speaker_inputs = []
         zast_input_nums = []
 
         audio_in_key = "audiokey"
@@ -61,6 +61,9 @@ class VmixState:
 
         zoom_in_key = "zoomkey"
         zoom_inputs = []
+
+        timer_key = "timerkey"
+        timer_inputs = []
         
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
@@ -72,11 +75,13 @@ class VmixState:
             if input_title.find(zast_key) >= 0:
                 zast_input_nums.append(input_num)
             elif input_title.find(speaker_key) >= 0:
-                speaker_inputs[input["@key"]] = input
+                speaker_inputs.append(input)
             elif input_title.find(audio_in_key) >= 0:
                 audio_inputs.append(input)
             elif input_title.find(zoom_in_key) >= 0:
                 zoom_inputs.append(input)
+            elif input_title.find(timer_key) >= 0:
+                timer_inputs.append(input)
 
         #check that every needed input is found
         current_state["parse_error"] = {
@@ -84,27 +89,28 @@ class VmixState:
                 "audio": len(audio_inputs) > 0,
                 "audio_zoom": len(zoom_inputs) > 0,
                 "speaker": len(speaker_inputs) > 0,
+                "timer": len(timer_inputs) > 0
                 }
 
         #check is input with zast_key in pgm
         if pgm_input_num not in zast_input_nums:
             current_state["online"] = True
-       
-        #check pgm input for title multiview overlay
-        if pgm_input and "overlay" in pgm_input:
-            for overlay in pgm_input["overlay"]:
-                if not "@key" in overlay: break;
-                key = overlay["@key"]
-                if overlay["@key"] in speaker_inputs.keys():
-                    speaker = speaker_inputs[key]
-                    speaker_name = speaker["text"]["#text"]
-                    name = speaker_name.split(" ")
-                    if speaker_name and len(name) == 3:
-                        name = speaker_name.split(" ")
-                        current_state["speaker"] = f"{name[0]} {name[1][0]}. {name[2][0]}."
-                    else:
-                        current_state["speaker"] = speaker_name
+        
+        #get inputs in overlays
+        overlay_inputs = []
+        for overlay in json_state["overlays"]["overlay"]:
+            if "#text" in overlay:
+                overlay_inputs.append(overlay["#text"])
+        
+        #get speaker name from title input
+        for input in speaker_inputs:
+            if input["@number"] in overlay_inputs:
+                current_state["speaker"] = self.get_name_from_input(input)
 
+        #check is timer running
+        for input in timer_inputs:
+            if input["@number"] in overlay_inputs:
+                current_state["speaker"] += f" {input['text']['#text']}"
 
         #check is recording
         if "#text" in json_state["recording"]:
@@ -165,7 +171,7 @@ class VmixState:
                     state = False
                 current_state[bus_name] = {
                         "state": state, 
-                        "volume": volume
+                        "volume": volume,
                         }
                                             
         if current_state != self.state:
@@ -174,3 +180,11 @@ class VmixState:
             self.state = current_state
         else:
             self.is_changed = False
+
+
+    def get_name_from_input(self, input) -> str:
+        if "text" not in input and len(input["text"]) < 1:
+            return ""
+
+        fullname = input["text"][1]["#text"]
+        return fullname.split(" ")[0]

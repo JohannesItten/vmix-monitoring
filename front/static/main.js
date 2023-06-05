@@ -1,6 +1,7 @@
 //
-// It's a spaghetii, which need to be rewrited as simple state machine
-//
+// It's a complete shit, but i need to sleep.
+// Anyway in stable branch it has been rewritten with Svelte
+// and normal state machine
 //
 
 const STATE_MAIN_ENABLED = "red", 
@@ -127,6 +128,7 @@ function processError(vmix_id, state, reason)
     {
         if (!state.recording) { errors.push({"level": 2, "reason": "Запись!"}); }
         if (!state.streaming) { errors.push({"level": 2, "reason": "Стрим!"}); }
+        if (!state.master.state) { errors.push({"level": 2, "reason": "МАСТЕР!!!"}); }
     }
     
     maxErrorLevel = 0;
