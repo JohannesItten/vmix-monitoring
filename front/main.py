@@ -21,7 +21,7 @@ with open("../vmixes.json", "r", encoding="utf-8") as file:
 
 for param in config['vmixes']:
     id = hashlib.md5((param["name"] + param["ip"]).encode("utf-8")).hexdigest()
-    vmixes[id] = param["name"]
+    vmixes[id] = [param["name"], param["parse"]]
 
 CONFIG_SERVER_IP = config['config']['server_ip']
 #

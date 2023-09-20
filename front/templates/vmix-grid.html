@@ -22,7 +22,7 @@
         <img src="{{ url_for('static', path='/img/rickroll.gif') }}"></img>
         {% endif %}
         
-        {% for id, name in vmixes.items() %}
+        {% for id, vmix in vmixes.items() %}
             <div class="cell" id="{{ id }}">
                 <div class="top-bar">
                     <span class="error grey">
@@ -31,19 +31,21 @@
                     </span>
                     <span class="speaker grey">
                         <i class="fa fa-microphone" aria-hidden="true"></i>
-                        <span class="speaker-name">?</span>
+                        <span class="speaker-name"></span>
                     </span>
-                    <span class="studio-name grey">{{ name }}</span>
+                    <span class="studio-name grey">{{ vmix[0] }}</span>
                 </div>
-                <div class="state">
-                    <span class="recording grey"><i class="fa fa-hdd-o" aria-hidden="true"></i><span>Rec</span></span>
-                    <span class="streaming grey"><i class="fa fa-youtube-play" aria-hidden="true"></i><span>Stream</span></span>
-                    <span class="online grey"><i class="fa fa-power-off" aria-hidden="true"></i><span>On Air</span></span>
-                    <span class="master red"><i class="fa fa-bus" aria-hidden="true"></i><span>M</span><span class="volume">100</span></span>
-                    <span class="busA red"><i class="fa fa-bus" aria-hidden="true"></i><span>A</span><span class="volume">100</span></span>
-                    <span class="audio red"><i class="fa fa-volume-up" aria-hidden="true"></i><span>MIC</span><span class="volume">100</span></span>
-                    <span class="zoom red"><i class="fa fa-volume-up" aria-hidden="true"></i><span>VKS</span><span class="volume">100</span></span>
-                </div>
+                {% if vmix[1] >= 0 %}
+                    <div class="state">
+                        <span class="recording grey"><i class="fa fa-hdd-o" aria-hidden="true"></i><span>Rec</span></span>
+                        <span class="streaming grey"><i class="fa fa-youtube-play" aria-hidden="true"></i><span>Stream</span></span>
+                        <span class="online grey"><i class="fa fa-power-off" aria-hidden="true"></i><span>On Air</span></span>
+                        <span class="master red"><i class="fa fa-bus" aria-hidden="true"></i><span>M</span><span class="volume">100</span></span>
+                        <span class="busA red"><i class="fa fa-bus" aria-hidden="true"></i><span>A</span><span class="volume">100</span></span>
+                        <span class="audio red"><i class="fa fa-volume-up" aria-hidden="true"></i><span>MIC</span><span class="volume">100</span></span>
+                        <span class="zoom red"><i class="fa fa-volume-up" aria-hidden="true"></i><span>VKS</span><span class="volume">100</span></span>
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
     </div>

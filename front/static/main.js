@@ -30,6 +30,7 @@ function recieveMessage(websocket)
 {
     websocket.addEventListener("message", ({ data }) => {
         msg = JSON.parse(data);
+        console.log(msg);
         if (msg.hasOwnProperty("init"))
         {
             processInitResponse(msg["init"]);
