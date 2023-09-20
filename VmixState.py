@@ -54,7 +54,7 @@ class VmixState:
         pgm_input_num = json_state["active"]
         zast_key = "zastkey"
         speaker_key = "speakerkey"
-        speaker_inputs = []
+        speaker_inputs = {}
         zast_input_nums = []
 
         audio_in_key = "audiokey"
@@ -62,6 +62,8 @@ class VmixState:
 
         zoom_in_key = "zoomkey"
         zoom_inputs = []
+
+        pres_key = "titlekey"
         
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
@@ -73,7 +75,7 @@ class VmixState:
             if input_title.find(zast_key) >= 0:
                 zast_input_nums.append(input_num)
             elif input_title.find(speaker_key) >= 0:
-                speaker_inputs.append(input)
+                speaker_inputs[input["@key"]] = input
             elif input_title.find(audio_in_key) >= 0:
                 audio_inputs.append(input)
             elif input_title.find(zoom_in_key) >= 0:
@@ -98,9 +100,22 @@ class VmixState:
                 overlay_inputs.append(overlay["#text"])
         
         #get speaker name from title input
-        for input in speaker_inputs:
+        #check name in overlay
+        overlay_name = ""
+        for guid, input in speaker_inputs.items():
             if input["@number"] in overlay_inputs:
-                current_state["speaker"] = self.get_name_from_input(input)
+                overlay_name = self.get_name_from_overlay(input)
+        #check name in pgm input layer
+        layer_name = ""
+        pgm_input_title = pgm_input["@title"]
+        if pgm_input_title.find(pres_key) >= 0:
+            layer_name = self.get_name_from_input(pgm_input, speaker_inputs)
+
+        if len(layer_name) > len(overlay_name):
+            current_state["speaker"] = layer_name
+        else:
+            current_state["speaker"] = overlay_name
+        #
 
         #check is recording
         if "#text" in json_state["recording"]:
@@ -126,7 +141,7 @@ class VmixState:
                 break
             state = not eval(input["@muted"])
             volume = round(float(input["@volume"]))
-            if volume < 40:
+            if volume < 50:
                 state = False
             current_state["audio"] = {
                     "state": state,
@@ -143,7 +158,7 @@ class VmixState:
                 break
             state = not eval(input["@muted"])
             volume = round(float(input["@volume"]))
-            if volume < 40:
+            if volume < 30:
                 state = False
             current_state["audio_zoom"] = {
                     "state": state,
@@ -157,7 +172,7 @@ class VmixState:
                 bus_state = json_state["audio"][bus_name]
                 state = not eval(bus_state["@muted"])
                 volume = round(float(bus_state["@volume"]))
-                if volume < 40:
+                if volume < 30:
                     state = False
                 current_state[bus_name] = {
                         "state": state, 
@@ -172,9 +187,36 @@ class VmixState:
             self.is_changed = False
 
 
-    def get_name_from_input(self, input) -> str:
+    def get_name_from_overlay(self, input) -> str:
         if "text" not in input and len(input["text"]) < 1:
             return ""
 
-        fullname = input["text"][1]["#text"]
-        return fullname.split(" ")[0]
+        lastname = input["text"][2]["#text"]
+        src_name = input["text"][1]["#text"].split(" ")
+        name = ""
+        for n in src_name:
+            name += n[:1] + "."
+        fullname = lastname + " " + name
+
+        return fullname
+    
+    
+    def get_name_from_input(self, input, speaker_inputs) -> str:
+        fullname = ""
+        speaker = None
+        for layer in input["overlay"]:
+            if layer["@key"] not in speaker_inputs.keys():
+                continue
+            speaker = speaker_inputs[layer["@key"]]
+            break
+        
+        if not speaker: return fullname
+        
+        lastname = speaker["text"][2]["#text"]
+        src_name = speaker["text"][1]["#text"].split(" ")
+        name = ""
+        for n in src_name:
+            name += n[:1] + "."
+        fullname = lastname + " " + name
+
+        return fullname

@@ -30,10 +30,6 @@ function recieveMessage(websocket)
 {
     websocket.addEventListener("message", ({ data }) => {
         msg = JSON.parse(data);
-        if (msg["id"] == "eb764f6ebabfd7132565a698062be6aa")
-        {
-            console.log(msg);
-        }
         if (msg.hasOwnProperty("init"))
         {
             processInitResponse(msg["init"]);
@@ -119,7 +115,7 @@ function processError(vmix_id, state, reason)
     //Process preset parse errors
     Object.keys(state.parse_error).forEach(key => {
         if (!state.parse_error[key]){
-            errors.push({"level": 1, "reason": "Пресет: " + key});
+            errors.push({"level": 1, "reason": key});
         }
     });
 
@@ -194,7 +190,8 @@ function processState(vmix_id, state)
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    const websocket = new WebSocket("ws://localhost:9090/");
+    let server_ip = document.getElementById("server_address").value
+    const websocket = new WebSocket("ws://" + server_ip + ":9090/");
     initConnection(websocket);
     recieveMessage(websocket);
 });

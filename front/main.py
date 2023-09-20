@@ -6,6 +6,8 @@ from fastapi.templating import Jinja2Templates
 import json
 import hashlib
 
+CONFIG_SERVER_IP = "localhost"
+
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -20,6 +22,8 @@ with open("../vmixes.json", "r", encoding="utf-8") as file:
 for param in config['vmixes']:
     id = hashlib.md5((param["name"] + param["ip"]).encode("utf-8")).hexdigest()
     vmixes[id] = param["name"]
+
+CONFIG_SERVER_IP = config['config']['server_ip']
 #
 
 @app.get("/vmix-grid", response_class=HTMLResponse)
@@ -39,6 +43,10 @@ async def get_paged_grid(request: Request, page: int = 1):
         page_vmixes[item[0]] = item[1]
 
 
-    return templates.TemplateResponse("vmix-grid.html", {"request": request, "page": page, "vmixes": page_vmixes})
+    return templates.TemplateResponse("vmix-grid.html", {"request": request,
+                                                         "page": page,
+                                                         "vmixes": page_vmixes,
+                                                         "server_ip": CONFIG_SERVER_IP 
+                                                         })
 
 

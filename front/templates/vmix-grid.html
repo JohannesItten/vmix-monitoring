@@ -16,6 +16,7 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/img/favicon.png')}}">
 </head>
 <body>
+    <input type="hidden" id="server_address" value="{{ server_ip }}"></input>
     <div class = "grid-col">
         {% if vmixes.items()|length == 0 %}
         <img src="{{ url_for('static', path='/img/rickroll.gif') }}"></img>
