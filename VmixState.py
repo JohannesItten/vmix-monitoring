@@ -61,9 +61,6 @@ class VmixState:
 
         zoom_in_key = "zoomkey"
         zoom_inputs = []
-
-        timer_key = "timerkey"
-        timer_inputs = []
         
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
@@ -80,16 +77,13 @@ class VmixState:
                 audio_inputs.append(input)
             elif input_title.find(zoom_in_key) >= 0:
                 zoom_inputs.append(input)
-            elif input_title.find(timer_key) >= 0:
-                timer_inputs.append(input)
 
         #check that every needed input is found
         current_state["parse_error"] = {
                 "zast": len(zast_input_nums) > 0,
                 "audio": len(audio_inputs) > 0,
                 "audio_zoom": len(zoom_inputs) > 0,
-                "speaker": len(speaker_inputs) > 0,
-                "timer": len(timer_inputs) > 0
+                "speaker": len(speaker_inputs) > 0
                 }
 
         #check is input with zast_key in pgm
@@ -106,11 +100,6 @@ class VmixState:
         for input in speaker_inputs:
             if input["@number"] in overlay_inputs:
                 current_state["speaker"] = self.get_name_from_input(input)
-
-        #check is timer running
-        for input in timer_inputs:
-            if input["@number"] in overlay_inputs:
-                current_state["speaker"] += f" {input['text']['#text']}"
 
         #check is recording
         if "#text" in json_state["recording"]:

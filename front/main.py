@@ -29,7 +29,7 @@ async def read_item(request: Request):
 
 @app.get("/grid/", response_class=HTMLResponse)
 async def get_paged_grid(request: Request, page: int = 1):
-    page_amount = 7
+    page_amount = 9
     page_vmixes_max = min([len(vmixes), page_amount * page])
     
     page_vmixes = {}
