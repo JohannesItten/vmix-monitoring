@@ -20,8 +20,12 @@ def read_config(filename):
         config = json.load(file)
 
     for param in config['vmixes']:
-        state = VS.VmixState(param["ip"], param["name"])
-        vmix_states[state.id] = state
+        parse_option = int(param["parse"])
+        skip = False
+        if parse_option < 0: skip = True
+        state = VS.VmixState(param["ip"], param["name"], skip=skip)
+        if not state.skip:
+            vmix_states[state.id] = state
 
 
 def read_args(args):
@@ -69,6 +73,10 @@ async def get_api_response(vmix_id, ip, session):
         async with session.get(url) as response:
             resp = await response.read()
             await process_api_response(vmix_id, resp)
+    except aiohttp.ServerDisconnectedError:
+        print("ServDisc: {}".format(ip))
+    except aiohttp.ClientOSError:
+        print("OSError: {}".format(ip))
     except aiohttp.ClientConnectorError:
         print("Unresolved: {}".format(ip))
         failed_state = vmix_states[vmix_id]

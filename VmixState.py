@@ -10,10 +10,11 @@ class VmixState:
     WARNING = 2
     ERROR = 3
 
-    def __init__(self, ip, studio_name):
+    def __init__(self, ip, studio_name, skip = False):
         self.id = hashlib.md5((studio_name + ip).encode("utf-8")).hexdigest()
         self.ip = ip
         self.studio_name = studio_name
+        self.skip = skip
         self.state = {}
         self.level = VmixState.INFO
         self.is_changed = False

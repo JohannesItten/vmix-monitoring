@@ -46,7 +46,7 @@ async def handler(websocket):
 async def main():
     loop = asyncio.get_running_loop()
     stop = loop.create_future()
-    loop.add_signal_handler(SIGTERM, stop.set_result, None)
+    # loop.add_signal_handler(SIGTERM, stop.set_result, None)
 
     port = int(os.environ.get("PORT", "9090"))
     async with websockets.serve(handler, "localhost", port):
@@ -55,5 +55,5 @@ async def main():
 
 if __name__ == "__main__":
     signal(SIGINT, exit_handler)
-    #asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
