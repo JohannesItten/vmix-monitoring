@@ -23,10 +23,7 @@ gotify = Gotify(
 
 
 async def send_onair_notify(id, name, current_onair_state):
-    try:
-        if vmix_onair_states[id] == current_onair_state: return
-    except KeyError:
-        pass
+    if vmix_onair_states[id] == current_onair_state: return
     vmix_onair_states[id] = current_onair_state
     if current_onair_state:
         msg = "Зал {} в эфире".format(name)
@@ -50,6 +47,8 @@ def read_config(filename):
         skip = False
         if parse_option < 0: skip = True
         state = VS.VmixState(param["ip"], param["name"], skip=skip)
+        # dumb gotify fix
+        vmix_onair_states[state.id] = None 
         if not state.skip:
             vmix_states[state.id] = state
 
@@ -88,7 +87,7 @@ async def process_api_response(vmix_id, response):
     state = vmix_states[vmix_id]
     state.updateState(response)
     if state.is_changed:
-        await send_onair_notify(vmix_id, state.studio_name, state.is_on_air)
+        await send_onair_notify(vmix_id, state.studio_name, state.is_on_air())
         vmix_states[vmix_id] = state
         await send_state(vmix_id, state.level, state.state)
 
