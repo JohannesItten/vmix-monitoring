@@ -220,3 +220,7 @@ class VmixState:
         fullname = lastname + " " + name
 
         return fullname
+    
+
+    def is_on_air(self) -> bool:
+        return self.state["online"]

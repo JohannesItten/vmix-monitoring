@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+from gotify import Gotify
 import logging
 import sys
 from time import time
@@ -12,6 +13,31 @@ import VmixState as VS
 
 WS_SERVER_URI = ""
 vmix_states = {}
+vmix_onair_states = {}
+
+# some hardcode for gotify messages
+gotify = Gotify(
+    base_url="http://178.20.45.62",
+    app_token="ALSxvkSEJ.-JcUj",
+)
+
+
+async def send_onair_notify(id, name, current_onair_state):
+    try:
+        if vmix_onair_states[id] == current_onair_state: return
+    except KeyError:
+        pass
+    vmix_onair_states[id] = current_onair_state
+    if current_onair_state:
+        msg = "Зал {} в эфире".format(name)
+    else:
+        msg = "Зал {} закончил".format(name)
+    
+    gotify.create_message(
+        msg,
+        title=msg,
+        priority=0,
+    )
 
 
 def read_config(filename):
@@ -62,6 +88,7 @@ async def process_api_response(vmix_id, response):
     state = vmix_states[vmix_id]
     state.updateState(response)
     if state.is_changed:
+        await send_onair_notify(vmix_id, state.studio_name, state.is_on_air)
         vmix_states[vmix_id] = state
         await send_state(vmix_id, state.level, state.state)
 
