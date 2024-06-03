@@ -171,12 +171,14 @@ function processState(vmix_id, state)
     //process audio
     switchBooleanPropertyState(stateElement, "master", state.master.state, "audio");
     switchBooleanPropertyState(stateElement, "busA", state.busA.state, "audio");
-    switchBooleanPropertyState(stateElement, "audio", state.audio.state, "audio");
-    switchBooleanPropertyState(stateElement, "zoom", state.audio_zoom.state, "audio");
+    switchBooleanPropertyState(stateElement, "busB", state.busB.state, "audio");
+    // switchBooleanPropertyState(stateElement, "audio", state.audio.state, "audio");
+    // switchBooleanPropertyState(stateElement, "zoom", state.audio_zoom.state, "audio");
     updateVolume(stateElement, "master", state.master.volume);
     updateVolume(stateElement, "busA", state.busA.volume);
-    updateVolume(stateElement, "audio", state.audio.volume);
-    updateVolume(stateElement, "zoom", state.audio_zoom.volume);
+    updateVolume(stateElement, "busB", state.busA.volume);
+    // updateVolume(stateElement, "audio", state.audio.volume);
+    // updateVolume(stateElement, "zoom", state.audio_zoom.volume);
 
     speakerElem = stateElement.querySelector(".speaker-name");
     

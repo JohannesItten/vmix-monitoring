@@ -17,8 +17,8 @@ vmix_onair_states = {}
 
 # some hardcode for gotify messages
 gotify = Gotify(
-    base_url="http://178.20.45.62",
-    app_token="ALSxvkSEJ.-JcUj",
+    base_url="http://89.208.222.92",
+    app_token="A8mQN-MQHYMj25v",
 )
 
 

@@ -37,15 +37,14 @@ class VmixState:
                 "streaming": False,
                 "streaming_channels": [],
                 "speaker": None,
+                "timer": None,
                 "master": {"state": False, "volume": 0},
-                "busA": {"state": False, "volume": 0}, 
-                "audio": {"muted": True, "volume": 0},
-                "audio_zoom": {"muted": True, "volume": 0},
+                "busA": {"state": False, "volume": 0},
+                "busB": {"state": False, "volume": 0},  
                 "parse_error": {
                                 "zast": True,
-                                "audio": True,
-                                "zoom": True,
-                                "speaker": True
+                                "speaker": True,
+                                "timer": True,
                                 } #error means there vmix preset parse errors  
             }
         # find input nums with zast_key in title
@@ -53,17 +52,11 @@ class VmixState:
         pgm_input = None
         pgm_input_num = json_state["active"]
         zast_key = "zastkey"
+        zast_input_nums = []
         speaker_key = "speakerkey"
         speaker_inputs = {}
-        zast_input_nums = []
-
-        audio_in_key = "audiokey"
-        audio_inputs = []
-
-        zoom_in_key = "zoomkey"
-        zoom_inputs = []
-
-        pres_key = "titlekey"
+        timer_key = "timerkey"
+        timer_inputs = []
         
         for input in json_state["inputs"]["input"]:
             input_title = input["@title"]
@@ -76,17 +69,14 @@ class VmixState:
                 zast_input_nums.append(input_num)
             elif input_title.find(speaker_key) >= 0:
                 speaker_inputs[input["@key"]] = input
-            elif input_title.find(audio_in_key) >= 0:
-                audio_inputs.append(input)
-            elif input_title.find(zoom_in_key) >= 0:
-                zoom_inputs.append(input)
+            elif input_title.find(timer_key) >= 0:
+                timer_inputs.append(input)
 
         #check that every needed input is found
         current_state["parse_error"] = {
                 "zast": len(zast_input_nums) > 0,
-                "audio": len(audio_inputs) > 0,
-                "audio_zoom": len(zoom_inputs) > 0,
-                "speaker": len(speaker_inputs) > 0
+                "speaker": len(speaker_inputs) > 0,
+                "timer": len(timer_inputs)
                 }
 
         #check is input with zast_key in pgm
@@ -105,17 +95,12 @@ class VmixState:
         for guid, input in speaker_inputs.items():
             if input["@number"] in overlay_inputs:
                 overlay_name = self.get_name_from_overlay(input)
-        #check name in pgm input layer
-        layer_name = ""
-        pgm_input_title = pgm_input["@title"]
-        if pgm_input_title.find(pres_key) >= 0:
-            layer_name = self.get_name_from_input(pgm_input, speaker_inputs)
-
-        if len(layer_name) > len(overlay_name):
-            current_state["speaker"] = layer_name
-        else:
-            current_state["speaker"] = overlay_name
+        current_state["speaker"] = overlay_name
         #
+        
+        #check timer state
+        if (len(timer_inputs) > 0):
+            current_state["speaker"] += " " + self.get_timer_state(timer_inputs[0])
 
         #check is recording
         if "#text" in json_state["recording"]:
@@ -131,44 +116,9 @@ class VmixState:
         else:
             current_state["streaming"] = eval(json_state["streaming"])
         
-        #audio inputs
-        for input in audio_inputs:
-            if "@muted" not in input:
-                current_state["audio"] = {
-                        "state": False,
-                        "volume": "off"
-                        }
-                break
-            state = not eval(input["@muted"])
-            volume = round(float(input["@volume"]))
-            if volume < 50:
-                state = False
-            current_state["audio"] = {
-                    "state": state,
-                    "volume": volume
-                    }
-
-        #zoom inputs
-        for input in zoom_inputs:
-            if "@muted" not in input:
-                current_state["audio_zoom"] = {
-                        "state": False,
-                        "volume": "off"
-                        }
-                break
-            state = not eval(input["@muted"])
-            volume = round(float(input["@volume"]))
-            if volume < 30:
-                state = False
-            current_state["audio_zoom"] = {
-                    "state": state,
-                    "volume": volume
-                    }
-
-
         #audio buses
         for bus_name in json_state["audio"]:
-            if bus_name in ["master", "busA"]:
+            if bus_name in ["master", "busA", "busB"]:
                 bus_state = json_state["audio"][bus_name]
                 state = not eval(bus_state["@muted"])
                 volume = round(float(bus_state["@volume"]))
@@ -187,18 +137,32 @@ class VmixState:
             self.is_changed = False
 
 
+    def get_timer_state(self, input) -> str:
+        if "text" not in input and len(input["text"]) < 1:
+            return ""
+        
+        timer = ""
+        try:
+            timer = input["text"]["#text"]
+        except:
+            print("Can't parse timer")
+
+        return timer
+        
+    
     def get_name_from_overlay(self, input) -> str:
         if "text" not in input and len(input["text"]) < 1:
             return ""
-
-        lastname = input["text"][2]["#text"]
-        src_name = input["text"][1]["#text"].split(" ")
+        
         name = ""
-        for n in src_name:
-            name += n[:1] + "."
-        fullname = lastname + " " + name
+        try:
+            fullname = input["text"][0]["#text"]
+            surname = fullname.split(" ")[0]
+            name = surname
+        except:
+            print("Can't parse name")
 
-        return fullname
+        return name
     
     
     def get_name_from_input(self, input, speaker_inputs) -> str:
