@@ -9,20 +9,21 @@ import json
 
 import websockets
 
-import VmixState as VS
+import Vmix as V
 
 WS_SERVER_URI = ""
 vmix_states = {}
 vmix_onair_states = {}
 
 # some hardcode for gotify messages
-gotify = Gotify(
-    base_url="http://89.208.222.92",
-    app_token="A8mQN-MQHYMj25v",
-)
+# gotify = Gotify(
+#     base_url="http://89.208.222.92",
+#     app_token="A8mQN-MQHYMj25v",
+# )
 
-
+#gotify send notify
 async def send_onair_notify(id, name, current_onair_state):
+    return
     if vmix_onair_states[id] == current_onair_state: return
     vmix_onair_states[id] = current_onair_state
     if current_onair_state:
@@ -46,7 +47,7 @@ def read_config(filename):
         parse_option = int(param["parse"])
         skip = False
         if parse_option < 0: skip = True
-        state = VS.VmixState(param["ip"], param["name"], skip=skip)
+        state = V.Vmix(param["ip"], param["name"], skip=skip)
         # dumb gotify fix
         vmix_onair_states[state.id] = None 
         if not state.skip:
