@@ -20,4 +20,28 @@
 
 16) Возможность посылать команды: fix/stopstream и тд
 
-## HOW IT SHOULD WORK
+## VMIX RULES SIMPLIFIED DESC
+
+RULE0
+{
+    ["keys"]:
+        "online": ["zastkey", "shapkakey"]
+        "towatch": ["testkey", "titlekey"]
+    ["online"]
+        ["isStreaming", "[params]", ERROR]
+        ["isRecording", "[params]", ERROR]
+        ["inputBusMapping", ["inputkey", "MABC"], WARNING]
+        ["!isInputMuted", ["inpu
+        tkey"], ERROR]
+        ["isInputMuted", ["musickey"], ERROR]
+    ["offline"]
+        ["isInputMuted", ["inputkey"], ERROR]
+        ["!isInputMuted", ["musickey"], WARN]
+    ["always"]
+        ["checkPreset", "", INFO]
+}
+
+RULEN
+{
+    ...
+}

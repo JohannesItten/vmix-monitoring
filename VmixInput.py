@@ -1,12 +1,14 @@
 class VmixInput:
+    PROP_NOT_FOUND = -1
+
     def __init__(self, number: int, 
-    key: str, title: str, overlays: list, props: dict, is_active: bool):
+    key: str, title: str, overlays: list, texts: dict, props: dict):
         self.number = number
         self.key = key
         self.title = title
         self.overlays = overlays
+        self.texts = texts
         self.props = props
-        self.is_active = is_active
 
 
     #if same key(guid) means same input
@@ -24,9 +26,9 @@ class VmixInput:
 
 
     def __str__(self):
-        return self.number + ": " + self.title
+        return f'Input {self.number}: {self.title}'
 
 
     def get_prop(self, prop):
-        if not prop in self.props: return -1
+        if not prop in self.props: return self.PROP_NOT_FOUND
         return self.props[prop]

@@ -1,15 +1,15 @@
 import xmltodict
+import VmixInput as VmixInput
+import VmixBus as VmixBus
+import VmixGlobal as VmixGlobal
 
-#state = snapshot of vMix XML API
-#element = streaming, recording, preview, active, etc. 
-#properties = streaming channel, meterF1, etc.
 
 class VmixXMLParser:
     XML_ROOT = 'vmix'
     #common XML element names for all vMix projects
     #except inputs, buses, overlays
-    COMMONS = ['version',
-                'edition'
+    GLOBALS = ['version',
+                'edition',
                 'streaming',
                 'recording',
                 'external',
@@ -34,14 +34,15 @@ class VmixXMLParser:
 
 
     def parse(self) -> dict:
-        commons = self.get_common_elements()
+        vmix_global = self.get_global_elements()
         buses = self.get_buses()
-        active_input = self.get_active_input(int(commons["active"]["state"]))
+        active_input_number = vmix_global.get_value("active")
+        active_input = self.get_input(active_input_number)
         needed_inputs = self.get_needed_inputs()
         overlays = self.get_used_overlays()
         
         result = {
-            "commons": commons,
+            "global": vmix_global,
             "buses": buses,
             "active": active_input,
             "needed": needed_inputs,
@@ -50,7 +51,7 @@ class VmixXMLParser:
         return result
 
 
-    #get element properties
+    #get xml element properties
     #blah-blah about xmltodict
     def get_element_properties(self, state) -> dict:
         props = {}
@@ -68,45 +69,83 @@ class VmixXMLParser:
         return props
 
 
+    def get_input_overlays(self, input) -> list:
+        input_overlays = []
+        if not "overlay" in input: return []
+        for overlay in input["overlay"]:
+            input_overlays.append(overlay[
+                "@key"])
+        return input_overlays
+
+
+    def get_input_texts(self, input) -> dict:
+        input_texts = {}
+        if not "text" in input: return {}
+        for text in input["text"]:
+            text_name = text['@name']
+            input_texts[text_name] = text["#text"]
+        return input_texts
+
+
     #get common elements properties and state
-    def get_common_elements(self) -> dict:
-        commons = {}
-        commons_names = self.COMMONS
+    def get_global_elements(self) -> VmixGlobal:
+        globals = {}
+        globals_names = self.GLOBALS
         state = self.json
         
-        for name in commons_names:
+        for name in globals_names:
             if name not in state:
                 continue
-            commons[name] = {
-                "state": state[name],
-                "properties": self.get_element_properties(state[name])
+            value = state[name]
+            if type(value) is not str:
+                value = value["#text"]
+            globals[name] = {
+                "value": value,
+                "props": self.get_element_properties(state[name])
             }
-        return commons
+
+        global_obj = VmixGlobal.VmixGlobal(globals) 
+        return global_obj
 
 
-    def get_buses(self) -> dict:
-        buses = {}
+
+    def get_buses(self) -> list:
+        buses = []
         root = self.BUSES_ROOT
         state = self.json
 
         for bus in state[root]:
-            buses[bus] = self.get_element_properties(state[root][bus])
+            bus_props = self.get_element_properties(state[root][bus])
+            buses.append(VmixBus.VmixBus(
+                name=bus,
+                is_muted=eval(bus_props["muted"]),
+                volume_bar=float(bus_props["volume"]),
+                props=bus_props
+            ))
         return buses
     
 
     #it works due to inputs always sorted by input number
-    def get_active_input(self, active_number: int=-1) -> dict:
-        if active_number <= 0: return {}
-        active_input = {}
+    def get_input(self, input_number: int=-1) -> VmixInput:
+        if input_number <= 0: return []
         state = self.json
         inputs = state[self.INPUTS_ROOT]["input"]
-        
-        return self.get_element_properties(inputs[active_number - 1])
+        input = inputs[input_number - 1]        
+
+        input_obj = VmixInput.VmixInput(
+            number=input_number,
+            key=input['@key'],
+            title=input['@title'],
+            overlays=self.get_input_overlays(input),
+            texts=self.get_input_texts(input),
+            props=self.get_element_properties(input)
+        )
+        return input_obj
 
 
     #inputs which we need to mon, found by user defined keys
-    def get_needed_inputs(self) -> dict:
-        needed_inputs = {}
+    def get_needed_inputs(self) -> list:
+        needed_inputs = []
         state = self.json
         keys = self.keys
 
@@ -116,8 +155,15 @@ class VmixXMLParser:
             input_number = input["@number"]
 
             if any(el in input_title for el in keys):
-                needed_inputs[input_number] = self.get_element_properties(input)
-
+                inputObj = VmixInput.VmixInput(
+                    number=input_number,
+                    key=input["@key"],
+                    title=input_title,
+                    overlays=self.get_input_overlays(input),
+                    texts=self.get_input_texts(input),
+                    props=self.get_element_properties(input)
+                )
+                needed_inputs.append(inputObj)
         return needed_inputs
 
 
@@ -129,6 +175,8 @@ class VmixXMLParser:
         inputs = state[self.INPUTS_ROOT]["input"]
         for overlay in state[self.OVERLAYS_ROOT]["overlay"]:
             if not "#text" in overlay: continue
-            used_overlays[overlay["@number"]] = inputs[int(overlay["#text"]) - 1]
+            input_number = int(overlay["#text"])
+            print(input_number)
+            used_overlays[overlay["@number"]] = self.get_input(input_number)
             if int(overlay["#text"]) == self.LAST_OVERLAY_NUMBER: break 
         return used_overlays

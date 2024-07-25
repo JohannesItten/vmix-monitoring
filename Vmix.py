@@ -1,6 +1,8 @@
 import hashlib
 import VmixXMLParser as Parser
 import VmixState as VmixState
+import VmixInput as VmixInput
+import VmixGlobal as VmixGlobal
 
 import pprint
 
@@ -34,24 +36,43 @@ class Vmix:
 
     def updateState(self, xml_state):
         parser = Parser.VmixXMLParser(xml=xml_state, 
-                                    keys=["zastkey", "testkey", "audiokey"])
+                                    keys=["zastkey", "testkey", "audiokey", "multikey", "titlekey"])
 
         snapshot = parser.parse()
+        COMMONS = [
+            'version',
+            'edition',
+            'streaming',
+            'recording',
+            'external',
+            'playList',
+            'multiCorder',
+            'fullscreen',
+            'preview',
+            'active'
+            ]
 
-        input_to_check = {}
-        current_state = VmixState.VmixState(snapshot, {})
-        for number in snapshot["needed"]:
-            input = snapshot["needed"][number]
-            if 'audiokey' in input['title']:
-                input_to_check = input
-        print("BusMap:", current_state.is_input_bus_mapping(input_to_check))
-        print("isMuted:", current_state.is_input_muted(input_to_check))                                    
-        # if current_state != self.state:
-        #     self.is_changed = True
-        #     self.level = Vmix.INFO
-        #     self.state = current_state
-        # else:
-        #     self.is_changed = False
+        for c in COMMONS:
+            val = snapshot["global"].get_value(c)
+            print(f'{c}: {val}')
+        print(snapshot["overlays"])
+        print(snapshot["active"])
+
+        # for b in snapshot["buses"]:
+        #     print(f'Bus {b.short_name}: {b.dbfs}, {b.volume}')
+        # for i in snapshot["needed"]:
+        #     print(i)
+
+        # current_state = VmixState.VmixState(snapshot, {})
+        # for input in snapshot["needed"]:
+        #     if 'audiokey' in input.title:
+        #         bus_map_res = current_state.is_input_bus_mapping(input)
+        #         is_muted_res = current_state.is_input_muted(input)
+        # print("BusMap(MABC):", bus_map_res)
+        # print("IsMuted:", is_muted_res)
+
+        # print("BusMap:", current_state.is_input_bus_mapping(input_to_check))
+        # print("isMuted:", current_state.is_input_muted(input_to_check))  
 
 
     #old functionality

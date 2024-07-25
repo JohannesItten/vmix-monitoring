@@ -1,4 +1,5 @@
 import time
+import VmixInput as VmixInput
 
 
 class VmixState:
@@ -41,29 +42,29 @@ class VmixState:
 
 
     #TODO: add errors and desc
-    def is_input_bus_mapping(self, input) -> bool:
+    def is_input_bus_mapping(self, input: VmixInput) -> bool:
         check_result = False
-        buses_input_key = "audiobusses"
+        buses_key = "audiobusses"
         bus_map = ["M", "A", "B"]
-        if not buses_input_key in input: return False
-        
+        prop_buses = input.get_prop(buses_key)
+        if  prop_buses == -1: return False
         delimeter = ","
         bus_map_string = delimeter.join(bus_map)
-        if bus_map_string == input[buses_input_key]: return True
+        if bus_map_string == prop_buses: return True
 
         return check_result
 
 
     #TODO: add errors and desc
-
-    
-    def is_input_muted(self, input):
+    def is_input_muted(self, input: VmixInput):
         check_result = True
         muted_key = "muted"
         volume_key = "volume"
-        if not muted_key in input or not volume_key in input:
+        prop_muted = input.get_prop(muted_key)
+        prop_volume = input.get_prop(volume_key)
+        if prop_muted == -1 or prop_volume == -1:
             return True
-        if not eval(input[muted_key]) and float(input[volume_key]) != 0:
+        if not eval(prop_muted) and float(prop_volume) != 0:
             return False
         return check_result
 
