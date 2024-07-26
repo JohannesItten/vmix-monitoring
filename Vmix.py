@@ -35,11 +35,11 @@ class Vmix:
 
 
     def updateState(self, xml_state):
-        parser = Parser.VmixXMLParser(xml=xml_state, 
-                                    keys=["zastkey", "testkey", "audiokey", "multikey", "titlekey"])
+        input_keys = ["zastkey", "testkey", "audiokey", "multikey", "titlekey"]
+        parser = Parser.VmixXMLParser(xml=xml_state, input_keys=input_keys)
 
         snapshot = parser.parse()
-        COMMONS = [
+        GLOBALS = [
             'version',
             'edition',
             'streaming',
@@ -49,19 +49,30 @@ class Vmix:
             'multiCorder',
             'fullscreen',
             'preview',
-            'active'
+            'active',
+            'preset'
             ]
 
-        for c in COMMONS:
-            val = snapshot["global"].get_value(c)
-            print(f'{c}: {val}')
-        print(snapshot["overlays"])
-        print(snapshot["active"])
+        print('===BUSES===')
+        for b in snapshot['buses']:
+            print(f'Bus {b.short_name}: {b.dbfs}, {b.volume}')
 
-        # for b in snapshot["buses"]:
-        #     print(f'Bus {b.short_name}: {b.dbfs}, {b.volume}')
-        # for i in snapshot["needed"]:
-        #     print(i)
+        print('\n===INPUTS===')
+        for i in snapshot['needed']:
+            print(i)
+
+        print('\n===VMIX GLOBAL===')
+        for i in GLOBALS:
+            print(f'{i}: {snapshot['global'].get_value(i)}')
+
+        print('\n===ACTIVE===')
+        print(snapshot['active'])
+
+        print('\n===ACTIVE OVERLAYS===')
+        for key, val in snapshot['overlays'].items():
+            print(f'{key}: {val}')
+
+        # print(snapshot["global"])
 
         # current_state = VmixState.VmixState(snapshot, {})
         # for input in snapshot["needed"]:
