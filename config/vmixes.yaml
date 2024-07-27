@@ -1,0 +1,12 @@
+#rule: skip means do not mon this vmix
+vmix-test:
+  name: maintest
+  unitName: Ivanov
+  ip: 127.0.0.1
+  rule: test
+
+vmix-test2:
+  name: skiptest
+  unitName: Sidorov
+  ip: 127.0.0.1
+  rule: skip

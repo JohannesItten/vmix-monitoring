@@ -6,13 +6,12 @@ import os
 import sys
 from signal import signal, SIGINT, SIGTERM
 
-
 SERVER_HOST = "localhost"
 IS_MUSTDIE = False
 
 watchers = set()
 
-#TODO: store states in db. Also check broadcast_to_watchers
+# TODO: store states in db. Also check broadcast_to_watchers
 vmix_states = {}
 
 
@@ -27,7 +26,7 @@ def read_args(args):
             IS_MUSTDIE = True
 
 
-def exit_handler(signal_recieved, frame):
+def exit_handler(signal_received, frame):
     print("\nShutting down server...\n")
     exit(0)
 
@@ -44,6 +43,7 @@ async def broadcast_to_watchers(message):
         vmix_states[state["id"]] = message
     websockets.broadcast(watchers, message)
 
+
 async def handler(websocket):
     try:
         message = await websocket.recv()
@@ -51,7 +51,7 @@ async def handler(websocket):
     except websockets.exceptions.ConnectionClosed:
         print("conn is closed")
         return
-    
+
     if "watch" in event["type"]:
         await watch(websocket)
     elif "update" in event["type"]:
@@ -61,7 +61,8 @@ async def handler(websocket):
 async def main():
     loop = asyncio.get_running_loop()
     stop = loop.create_future()
-    if not IS_MUSTDIE: loop.add_signal_handler(SIGTERM, stop.set_result, None)
+    if not IS_MUSTDIE:
+        loop.add_signal_handler(SIGTERM, stop.set_result, None)
 
     port = int(os.environ.get("PORT", "9090"))
     async with websockets.serve(handler, SERVER_HOST, port):
@@ -71,5 +72,6 @@ async def main():
 if __name__ == "__main__":
     read_args(sys.argv[1:])
     signal(SIGINT, exit_handler)
-    if IS_MUSTDIE: asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    if IS_MUSTDIE:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())

@@ -24,7 +24,8 @@ vmix_onair_states = {}
 #gotify send notify
 async def send_onair_notify(id, name, current_onair_state):
     return
-    if vmix_onair_states[id] == current_onair_state: return
+    if vmix_onair_states[id] == current_onair_state:
+        return
     vmix_onair_states[id] = current_onair_state
     if current_onair_state:
         msg = "Зал {} в эфире".format(name)
