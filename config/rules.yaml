@@ -1,35 +1,21 @@
-пшеtest:
+test:
   idle: [zastkey, shapkakey]
   watch: [testkey, multikey, audiokey]
   buses: [M, A, B]
   online: [
     [streaming,[],error],
     [recording,[],info],
-    [/busMuted,[A],info]
+    [/busMuted,[A],info],
+    [/inputMuted, [audiokey], error],
   ]
   offline: [
-    [/streaming,[],error],
-    [/recording,[],info]
+    [busMuted,[A], info],
+    [inputMuted,[audiokey], error]
   ]
   always: [
-    [busMappingCorrect,[audiokey, MABC],error],
+    [inputBus,[audiokey, MABC],error],
     [/external,[],warning],
-    [presetOk,[],info]
+    [preset,[],info],
+    [multiCorder,[],info],
+    [fullscreen,[],info],
   ]
-
-engrus:
-  idle: [zastkey]
-  watch: [testkey, multikey, audiokey, titlekey]
-  buses: [M, A, B, C]
-  online: [
-    [streaming,[],error],
-    [recording,[],info]
-  ]
-  offline: [
-    [/streaming,[],error],
-    [/recording,[],info]
-  ]
-  always: [
-    [external,[],warning],
-    [busMappingCorrect,[audiokey, MABC],error]
-    ]

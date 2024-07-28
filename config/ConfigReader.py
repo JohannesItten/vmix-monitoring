@@ -7,19 +7,19 @@ def translate_rules(rule_list) -> list:
     real_rules = []
     for user_rule in rule_list:
         func_name = user_rule[0]
-        is_invert_result = False
+        expected_result = True
         if INVERT_RESULT_KEY in func_name:
             func_name = func_name[1:]
-            is_invert_result = True
+            expected_result = False
         if func_name not in RULES_DICTIONARY:
             continue
         real_rule = RULES_DICTIONARY[func_name]
         real_rules.append({
             'function': real_rule[0],
             'args': user_rule[1],
-            'type': real_rule[1],
-            'verbosity': user_rule[2],
-            'invert_result': is_invert_result
+            'expected_result': expected_result,
+            'error_verbosity': user_rule[2],
+            'error_description': real_rule[1] if expected_result else real_rule[2]
         })
     return real_rules
 

@@ -1,0 +1,44 @@
+streaming:
+  description: The Streaming button is NOT pressed
+  inverted: The Streaming button is pressed
+
+recording:
+  description: The Recording button is NOT pressed
+  inverted: The Recording button is pressed
+
+external:
+  description: The External button is NOT pressed
+  inverted: The Recording button is pressed
+
+fullscreen:
+  description: The Fullscreen button is NOT pressed
+  inverted: The Fullscreen button is pressed
+
+presetOk:
+  description: The vMix preset does not contain the required keys
+  inverted: The preset contains all the necessary keys
+
+busMuted:
+  description: The bus is muted
+  inverted: The bus is not muted
+
+inputBusMappingCorrect:
+  description: Not all required buses enabled
+  inverted: All required buses enabled
+
+inputMuted:
+  description: The input is muted
+  inverted: The input is NOT muted
+
+#TODO
+busLevelLow:
+  description: Low bus level
+  inverted: Bus level is NOT low
+
+inputLevelLow:
+  description: Low input level
+  inverted: Input level is NOT low
+
+cutDelta:
+  description: The director fell asleep
+  inverted: The director does not sleep

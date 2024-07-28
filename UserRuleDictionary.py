@@ -1,16 +1,55 @@
 INVERT_RESULT_KEY = '/'
 
-RULE_GLOBAL = 'global'
-RULE_BUS = 'bus'
-RULE_INPUT = 'input'
+# user_function_name (rules.yaml): [
+#    real_function_name,
+#    error if function return False,
+#    error if function return True. It need's for inverted results
+# ]
 
-# function/method name, params, type of check
-# type of check needs to exclude multiple loops
 RULES_DICTIONARY = {
-    'streaming': ['is_streaming', RULE_GLOBAL],
-    'recording': ['is_recording', RULE_GLOBAL],
-    'external': ['is_external', RULE_GLOBAL],
-    'presetOk': ['is_preset_ok', RULE_GLOBAL],
-    'busMuted': ['is_bus_muted', RULE_BUS],
-    'busMappingCorrect': ['is_input_bus_mapping_correct', RULE_INPUT]
+    'streaming': [
+        'is_streaming',
+        'The Streaming button is NOT pressed',
+        'The Streaming button is pressed'
+    ],
+    'recording': [
+        'is_recording',
+        'The Recording button is NOT pressed',
+        'The Recording button is pressed'
+    ],
+    'external': [
+        'is_external',
+        'The External button is NOT pressed',
+        'The External button is pressed'
+    ],
+    'preset': [
+        'is_preset_ok',
+        'The vMix preset does not contain the required keys',
+        'The preset contains all the necessary keys'
+    ],
+    'busMuted': [
+        'is_bus_muted',
+        'The bus is NOT muted',
+        'The bus is muted'
+    ],
+    'inputMuted': [
+        'is_input_muted',
+        'The input is NOT muted',
+        'The input is muted'
+    ],
+    'inputBus': [
+        'is_input_bus_mapping_correct',
+        'Not all required buses enabled',
+        'All required buses enabled'
+    ],
+    'multiCorder': [
+        'is_multicorder',
+        'The MultiCorder button is NOT pressed',
+        'The MultiCorder button is pressed'
+    ],
+    'fullscreen': [
+        'is_fullscreen',
+        'The Fullscreen button is NOT pressed',
+        'The Fullscreen button is pressed'
+    ]
 }
