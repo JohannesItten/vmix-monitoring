@@ -32,6 +32,12 @@ class VmixInput:
     def __str__(self):
         return f'Input {self.number}: {self.title}'
 
+    def dump(self):
+        dump = {}
+        for key, attr in self.__dict__.items():
+            dump[key] = attr
+        return dump
+
     def get_prop(self, prop):
         if prop not in self.props:
             return self.PROP_NOT_FOUND

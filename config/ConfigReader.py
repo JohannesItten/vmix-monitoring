@@ -1,5 +1,6 @@
 import yaml
 import StateRule
+import Vmix
 from UserRuleDictionary import RULES_DICTIONARY, INVERT_RESULT_KEY
 
 
@@ -50,6 +51,17 @@ class ConfigReader:
 
     def read_vmixes(self, filename):
         with open(file=self.CONFIG_DIR + filename, mode='r') as config:
-            rules = yaml.safe_load(config)
-        # print(rules)
-        pass
+            config_content = yaml.safe_load(config)
+        vmixes = {}
+        for key, vmix in config_content.items():
+            vmix_obj = Vmix.Vmix(
+                name=vmix['name'],
+                unit=vmix['unit'],
+                ip=vmix['ip'],
+                port=vmix['port'],
+                username=vmix['username'],
+                password=vmix['password'],
+                rule_name=vmix['rule']
+            )
+            vmixes[vmix_obj.id] = vmix_obj
+        return vmixes

@@ -1,12 +1,18 @@
 #rule: skip means do not mon this vmix
-vmix-test:
+vmix-testmon:
   name: maintest
-  unitName: Ivanov
-  ip: 127.0.0.1
+  unit: Ivanov
+  ip: 192.168.10.254
+  port: 8088
+  username: admin
+  password: 123
   rule: test
 
 vmix-test2:
   name: skiptest
-  unitName: Sidorov
+  unit: Sidorov
   ip: 127.0.0.1
-  rule: skip
+  port:
+  username:
+  password:
+  rule:

@@ -39,7 +39,7 @@ RULES_DICTIONARY = {
     ],
     'inputBus': [
         'is_input_bus_mapping_correct',
-        'Not all required buses enabled',
+        'Required buses is not enabled',
         'All required buses enabled'
     ],
     'multiCorder': [

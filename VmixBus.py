@@ -19,6 +19,12 @@ class VmixBus:
         self.dbfs = self.__get_dbfs()
         self.volume = self.__get_volume()
 
+    def dump(self):
+        dump = {}
+        for key, attr in self.__dict__.items():
+            dump[key] = attr
+        return dump
+
     def get_prop(self, prop):
         if prop not in self.props:
             return self.PROP_NOT_FOUND

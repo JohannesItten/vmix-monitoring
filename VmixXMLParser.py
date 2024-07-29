@@ -161,9 +161,7 @@ class VmixXMLParser:
                     props=input_attributes,
                     user_key=key
                 )
-                if key not in needed_inputs:
-                    needed_inputs[key] = []
-                needed_inputs[key].append(input_obj)
+                needed_inputs[key] = input_obj
         return needed_inputs
 
     # inputs info got same way as get_active_input

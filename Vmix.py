@@ -4,24 +4,41 @@ import config.ConfigReader as ConfigReader
 
 
 class Vmix:
-    def __init__(self, ip, studio_name, skip=False):
-        self.id = hashlib.md5((studio_name + ip).encode("utf-8")).hexdigest()
+    DEFAULT_PORT = 8088
+
+    def __init__(self,
+                 name,
+                 unit,
+                 ip,
+                 port,
+                 username=None,
+                 password=None,
+                 rule_name=None):
+        self.name = name
+        self.unit = unit
         self.ip = ip
-        self.studio_name = studio_name
-        self.skip = skip
-        self.state = {}
-        self.level = 0
-        self.is_changed = False
+        self.port = port
+        self.username = username
+        self.password = password
+        self.rule_name = rule_name
+        self.state = None
 
-    def __str__(self):
-        return "{} : {}".format(self.id, self.ip)
+        self.id = self.__get_vmix_id()
+        self.api_uri = self.__get_vmix_api_uri()
 
-    def __eq__(self, other) -> bool:
-        return self.state == other.state and self.ip == other.ip
+    def __get_vmix_id(self):
+        hash_template = '{}-{}-{}'.format(self.name, self.ip, self.unit)
+        vmix_id = hashlib.md5(hash_template.encode('UTF-8'))
+        return vmix_id.hexdigest()
 
-    def updateState(self, xml_state):
-        reader = ConfigReader.ConfigReader()
-        user_rules = reader.read_rules('rules.yaml')
-        # reader.read_vmixes('vmixes.yaml')
-        state = VmixState.VmixState(xml_snapshot=xml_state, rule=user_rules['test'])
+    def __get_vmix_api_uri(self):
+        url_template = 'http://{}:{}@{}:{}/api'
+        return url_template.format(self.username,
+                                   self.password,
+                                   self.ip,
+                                   self.port)
+
+    def process_xml_snapshot(self, xml_snapshot, rule):
+        state = VmixState.VmixState(xml_snapshot=xml_snapshot, rule=rule)
         state.update_state()
+        self.state = state

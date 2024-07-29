@@ -1,4 +1,3 @@
-import pprint
 import time
 import VmixXMLParser as Parser
 import StateRule
@@ -16,6 +15,7 @@ class VmixState:
             'parsing': []
         }
         self.last_update = int(time.time())
+        self.snapshot_dump = None
 
     def update_state(self):
         parser = Parser.VmixXMLParser(self.xml_snapshot, self.rule.inputs_keys)
@@ -24,9 +24,7 @@ class VmixState:
         is_online = self.__is_online()
         check_rules = self.rule.online if is_online else self.rule.offline
         self.__check_state(check_rules)
-        print(f'\nIs Online: {is_online}\n')
-        print('Errors')
-        pprint.pp(self.errors)
+        self.snapshot_dump = self.snapshot.dump()
 
     def __check_state(self, rules):
         for rule in rules:
@@ -58,11 +56,13 @@ class VmixState:
     def is_preset_ok(self):
         found_keys = list(self.snapshot.inputs.keys())
         found_keys.sort()
-        self.rule.inputs_keys.sort()
-        result = found_keys == self.rule.inputs_keys
+        needed_keys = self.rule.inputs_keys
+        needed_keys.sort()
+        result = found_keys == needed_keys
+        info = ','.join([x for x in needed_keys if x not in found_keys])
         return {
             'result': result,
-            'info': None
+            'info': info
         }
 
     def is_streaming(self):
@@ -119,7 +119,7 @@ class VmixState:
                 'result': None,
                 'info': f'Input not found in preset ({input_key})'
             }
-        vmix_input = self.snapshot.inputs[input_key][0]
+        vmix_input = self.snapshot.inputs[input_key]
         try:
             is_muted = eval(vmix_input.get_prop('muted'))
             volume_bar = float(vmix_input.get_prop('volume'))
@@ -140,7 +140,7 @@ class VmixState:
                 'result': None,
                 'info': f'Input not found in preset ({input_key})'
             }
-        vmix_input = self.snapshot.inputs[input_key][0]
+        vmix_input = self.snapshot.inputs[input_key]
         input_buses = vmix_input.get_prop('audiobusses')
         if input_buses is None:
             return {
@@ -149,9 +149,14 @@ class VmixState:
             }
         needed_bus_mapping = ','.join(needed_bus_mapping)
         result = input_buses == needed_bus_mapping
+        info = '{}: {} required: ({})'.format(
+            input_key,
+            ','.join(input_buses),
+            needed_bus_mapping
+        )
         return {
             'result': result,
-            'info': input_buses
+            'info': info
         }
 
     def __cut_delta(self):

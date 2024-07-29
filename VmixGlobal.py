@@ -4,6 +4,9 @@ class VmixGlobal:
     def __init__(self, globals: dict):
         self.globals = globals
 
+    def dump(self):
+        return self.globals
+
     def get_value(self, name):
         if name not in self.globals.keys():
             return self.PROP_NOT_FOUND

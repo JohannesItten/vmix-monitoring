@@ -53,8 +53,10 @@ async def handler(websocket):
         return
 
     if "watch" in event["type"]:
+        print('watcher connected')
         await watch(websocket)
     elif "update" in event["type"]:
+        print(message)
         await broadcast_to_watchers(message)
 
 
