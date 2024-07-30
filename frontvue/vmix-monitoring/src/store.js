@@ -1,51 +1,6 @@
 import { createStore } from 'vuex'
 
 let vmixes = {}
-for (let i=0; i<9; i++)
-{
-    vmixes[i] = {
-        'name': null,
-        'props': {
-            recording: {
-                text: 'RECORD',
-                icon: 'fa fa-hdd-o',
-                state: null,
-                value: null,
-                cssClass: 'grey'
-              },
-              streaming: {
-                text: 'STREAM',
-                icon: 'fa fa-youtube-play',
-                state: null,
-                value: null,
-                cssClass: 'grey'
-              },
-              master: {
-                text: 'M',
-                icon: 'fa fa-bus',
-                state: null,
-                value: null,
-                cssClass: 'grey'
-              },
-              busA: {
-                text: 'A',
-                icon: 'fa fa-bus',
-                state: null,
-                value: null,
-                cssClass: 'grey'
-              },
-              audiokey: {
-                text: 'AUDIO',
-                icon: 'fa fa-volume-up',
-                state: null,
-                value: null,
-                cssClass: 'grey'
-              }
-        },
-        'info': [],
-        'isOnline': true
-    }
-}
 
 const defaultClass = 'grey';
 const activeGlobalClass = 'red';
@@ -64,11 +19,24 @@ const store = createStore({
     }
   },
   mutations: {
+    init (state, payload) {
+        for (const index in payload)
+        {
+            let vmix = payload[index];
+            state.vmixes[vmix.id] = {
+                'name': vmix.name,
+                'info': [],
+                'isOnline': false,
+                'props':  vmix.view
+            }
+        }
+    },
     updateProps (state, payload) {
-        //TODO: check vmix id
-        let vmixId = 0;
+        let vmixId = payload.vmixId;
+        if (!state.vmixes.hasOwnProperty(vmixId)) return;
         let vmix = state.vmixes[vmixId];
         vmix.name = payload.name;
+        vmix.isOnline = payload.isOnline;
         
         let global = payload.snapshot.global;
         let buses = payload.snapshot.buses;

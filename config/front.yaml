@@ -1,0 +1,16 @@
+test:
+  recording:
+    text: REC
+    icon: fa fa-hdd-o
+  streaming:
+    text: STREAM
+    icon: fa fa-youtube-play
+  master:
+    text: M
+    icon: fa fa-bus
+  busG:
+    text: G
+    icon: fa fa-bus
+  audiokey:
+    text: AUDIO
+    icon: fa fa-volume-up
