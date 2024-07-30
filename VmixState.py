@@ -16,13 +16,14 @@ class VmixState:
         }
         self.last_update = int(time.time())
         self.snapshot_dump = None
+        self.online = None
 
     def update_state(self):
         parser = Parser.VmixXMLParser(self.xml_snapshot, self.rule.inputs_keys)
         self.snapshot = parser.parse()
         self.__check_state(self.rule.always)
-        is_online = self.__is_online()
-        check_rules = self.rule.online if is_online else self.rule.offline
+        self.online = self.__is_online()
+        check_rules = self.rule.online if self.online else self.rule.offline
         self.__check_state(check_rules)
         self.snapshot_dump = self.snapshot.dump()
 

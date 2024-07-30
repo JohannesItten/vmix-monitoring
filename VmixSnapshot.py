@@ -19,12 +19,12 @@ class VmixSnapshot:
     def dump(self):
         vmix_global = self.vmix_global.dump()
         active = self.vmix_global.dump()
-        buses = []
+        buses = {}
         for short_name, bus in self.buses.items():
-            buses.append(bus.dump())
-        inputs = []
+            buses[bus.name] = bus.dump()
+        inputs = {}
         for user_key, vmix_input in self.inputs.items():
-            inputs.append(vmix_input.dump())
+            inputs[user_key] = vmix_input.dump()
         overlays = {}
         mixes = {}
         for mix_number, active_input in self.mixes.items():

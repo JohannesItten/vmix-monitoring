@@ -63,5 +63,5 @@ class MonitorServer:
         vmix = self.vmixes[vmix_id]
         snapshot_dump = json.dumps(vmix.state.snapshot_dump)
         async with websockets.connect('ws://127.0.0.1:9090') as connect:
-            client_info = {'type': 'update', 'id': vmix_id, 'message': snapshot_dump}
+            client_info = {'type': 'update', 'id': vmix_id, 'name': vmix.name, 'message': snapshot_dump}
             await connect.send(json.dumps(client_info))

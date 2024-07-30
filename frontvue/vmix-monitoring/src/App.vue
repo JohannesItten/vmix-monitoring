@@ -1,77 +1,9 @@
 <template>
   <div class='multiview'>
-    <div class='vmix' v-for='i in 9'>
-      <div class='top-bar'>
-        <div class='info'>
-          <i class='fa fa-info' aria-hidden='true'></i>
-          <span class='info-value'>Какая-то инфа</span>
-        </div>
-        <div class='name'>
-          <span class='name-value'>Большой</span>
-        </div>
-      </div>
-      <div class='main-space'></div>
-      <div class='low-bar'>
-        <div class='state recording red' data-type='global'>
-          <div>
-            <i class='fa fa-hdd-o' aria-hidden='true'></i>
-          </div>
-          <div>
-            <span class='state-name'>RECORD</span>
-          </div>
-          <div>
-            <span class='state-value'></span>
-          </div>
-        </div>
-        <div class='state red' data-type='global'>
-          <div>
-            <i class='fa fa-youtube-play' aria-hidden='true'></i>
-          </div>
-          <div>
-            <span class='state-name'>STREAM</span>
-          </div>
-          <div>
-            <span class='state-value'></span>
-          </div>
-        </div>
-        <div class='state red' data-type='audio'>
-          <div>
-            <i class='fa fa-power-off' aria-hidden='true'></i>
-          </div>
-          <div>
-            <span class='state-name'>ON AIR</span>
-          </div>
-          <div>
-            <span class='state-value'></span>
-          </div>
-        </div>
-        <div class='state green' data-type='audio'>
-          <div>
-            <i class='fa fa-bus' aria-hidden='true'></i>
-          </div>
-          <div>
-            <span class='state-name'>M</span>
-          </div>
-          <div>
-            <span class='state-value'>100</span>
-          </div>
-        </div>
-        <div class='state green' data-type='audio'>
-          <div>
-            <i class='fa fa-hdd-o' aria-hidden='true'></i>
-          </div>
-          <div>
-            <span class='state-name'>AUDIO</span>
-          </div>
-          <div>
-            <span class='state-value'>100</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <vmix v-for='id in sampleIds' :vmixId='id' :key='id'/>
   </div>
 </template>
-<script>
+<script setup>
   // const resolution = [
   //   [1920, 1080],
   //   [2560, 1440],
@@ -79,6 +11,11 @@
   // ];
   // const maxPerLine = 4;
   // const maxPerColumn = 4;
+
+  import store from './store'
+
+  let sampleIds = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+
   const socket = new WebSocket('ws://localhost:9090');
   socket.onopen = (event) => {
     console.log('Connection opened');
@@ -96,10 +33,11 @@
 
   const processMessage = (message) => {
     if (!message.hasOwnProperty('message')) return;
-    let vmix_response = JSON.parse(message['message']);
-    let global = vmix_response.global;
-    let isStreaming = global.streaming.value;
-    console.log('IsStreaming: ' + isStreaming);
+    let vmixSnapshot = JSON.parse(message['message']);
+    let payload = {name: message.name, 
+                  vmixId: message.id,
+                  snapshot: vmixSnapshot};
+    store.commit('updateProps', payload);
   };
 </script>
 <style>
@@ -196,7 +134,7 @@
   }
 
   .low-bar .state
-  
+
   {
     border-radius: 7px;
     display: inline-grid;
