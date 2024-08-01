@@ -7,6 +7,7 @@ html
   font-variation-settings: 'wdth' 100;
   font-size: 0.85em;
 }
+
 body
 {
     width: 1920px;
@@ -18,12 +19,37 @@ body
     margin: 0;
     padding: 0;
 }
+
+.critical-error-message
+{
+  position: fixed;
+  /* display: none; */
+  width: 100%;
+  height: 7%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background-color: rgba(51,51,51);
+  text-align: center;
+  font-style: italic;
+  font-size: 1.5em;
+  color: white;
+  justify-content: center;
+  align-items: center;
+  grid-template-columns: repeat(2, auto);
+  gap: 1%;
+  margin: 0;
+}
+
 .multiview
 {
   display: grid;
-  grid-template-columns: repeat(3, auto);
+  grid-template-columns: repeat(auto-fill, 640px);
   grid-template-rows: repeat(3, auto);
 }
+
 .vmix
 {
   background-color: rgba(51,51,51,0.9);
@@ -64,7 +90,7 @@ body
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 8%;
+  min-width: 20px;
 }
 
 .top-bar .info span
@@ -91,7 +117,6 @@ body
 }
 
 .low-bar .state
-
 {
   border-radius: 7px;
   display: inline-grid;
@@ -113,10 +138,15 @@ body
 
 .green
 {
-  background-color: #00CC33 !important;
+  background-color: #00CC33;
 }
 
 .grey
 {
-  background-color: #999999 !important;
+  background-color: #999999;
+}
+
+.grey-info
+{
+  background-color: #CCCCCC;
 }

@@ -16,3 +16,12 @@ vmix-test2:
   username:
   password:
   rule:
+
+vmix-test3:
+  name: configtest
+  unit: kkk
+  ip: 192.168.10.255
+  port:
+  username:
+  password:
+  rule:

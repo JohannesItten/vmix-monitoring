@@ -1,15 +1,43 @@
-import { createStore } from 'vuex'
+import {createStore} from 'vuex'
 
 let vmixes = {}
 
 const defaultClass = 'grey';
-const activeGlobalClass = 'red';
-const activeAudioClass = 'green';
+const redClass = 'red';
+const greenClass = 'green';
+const yellowClass = 'yellow';
 
-function getGlobalPropClass(propState, isAudio = false)
+function getGlobalPropClass(propState)
 {
-    let propClass = propState === 'True' ? activeGlobalClass : defaultClass;
-    return propClass;
+    return propState === 'True' ? redClass : defaultClass;
+}
+
+function getInfoCSSClass(verbosity)
+{
+    switch(verbosity)
+    {
+        case 'parsing':
+        case 'error':
+            return redClass;
+        case 'warning':
+            return yellowClass;
+    }
+    return null;
+}
+
+function processVmixErrors(state, vmixId, vmixErrors)
+{
+    for (let verbosity in vmixErrors)
+    {
+        let errors = vmixErrors[verbosity];
+        if (errors.length === 0) continue;
+        state.vmixes[vmixId].info = errors[0];
+        state.vmixes[vmixId].infoCSSClass = getInfoCSSClass(verbosity);
+        return;
+    }
+
+    state.vmixes[vmixId].info = null;
+    state.vmixes[vmixId].infoCSSClass = defaultClass;
 }
 
 const store = createStore({
@@ -25,19 +53,27 @@ const store = createStore({
             let vmix = payload[index];
             state.vmixes[vmix.id] = {
                 'name': vmix.name,
-                'info': [],
                 'isOnline': false,
+                'info': null,
+                'infoCSSClass': null,
                 'props':  vmix.view
             }
         }
     },
-    updateProps (state, payload) {
+    monitorError(state, payload) {
+        let vmixId = payload.vmixId;
+        if (!state.vmixes.hasOwnProperty((vmixId))) return;
+        let vmix = state.vmixes[vmixId];
+        vmix.info = payload.error.text;
+    },
+    updateVmix (state, payload) {
         let vmixId = payload.vmixId;
         if (!state.vmixes.hasOwnProperty(vmixId)) return;
+        processVmixErrors(state, vmixId, payload.errors)
         let vmix = state.vmixes[vmixId];
         vmix.name = payload.name;
         vmix.isOnline = payload.isOnline;
-        
+
         let global = payload.snapshot.global;
         let buses = payload.snapshot.buses;
         let inputs = payload.snapshot.inputs;
@@ -52,8 +88,8 @@ const store = createStore({
             if (buses.hasOwnProperty(propKey))
             {
                 let volumeBar = Math.round(parseFloat(buses[propKey].volume_bar));
-                let cssClass = activeAudioClass;
-                if (buses[propKey].is_muted || volumeBar == 0)
+                let cssClass = greenClass;
+                if (buses[propKey].is_muted || volumeBar === 0)
                     cssClass = defaultClass;
                 vmix.props[propKey].cssClass = cssClass;
                 vmix.props[propKey].value = volumeBar;
@@ -62,12 +98,11 @@ const store = createStore({
             if (inputs.hasOwnProperty(propKey))
             {
                 let volumeBar = Math.round(parseFloat(inputs[propKey].props.volume));
-                let cssClass = activeAudioClass;
-                if (inputs[propKey].props.muted === 'True' || volumeBar == 0)
+                let cssClass = greenClass;
+                if (inputs[propKey].props.muted === 'True' || volumeBar === 0)
                     cssClass = defaultClass;
                 vmix.props[propKey].cssClass = cssClass;
                 vmix.props[propKey].value = volumeBar;
-                continue;
             }
         }
     }

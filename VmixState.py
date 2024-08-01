@@ -9,10 +9,10 @@ class VmixState:
         self.rule = rule
         self.snapshot = None
         self.errors = {
+            'parsing': [],
             'error': [],
-            'info': [],
             'warning': [],
-            'parsing': []
+            'info': []
         }
         self.last_update = int(time.time())
         self.snapshot_dump = None
@@ -132,7 +132,7 @@ class VmixState:
         result = is_muted or volume_bar == 0
         return {
             'result': result,
-            'info': None
+            'info': input_key
         }
 
     def is_input_bus_mapping_correct(self, input_key, needed_bus_mapping):

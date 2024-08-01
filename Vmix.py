@@ -2,9 +2,10 @@ import hashlib
 import VmixState as VmixState
 import config.ConfigReader as ConfigReader
 
+DEFAULT_PORT = '8088'
+
 
 class Vmix:
-    DEFAULT_PORT = 8088
 
     def __init__(self,
                  name,
@@ -17,7 +18,7 @@ class Vmix:
         self.name = name
         self.unit = unit
         self.ip = ip
-        self.port = port
+        self.port = DEFAULT_PORT if port is None else port
         self.username = username
         self.password = password
         self.rule_name = rule_name
@@ -32,6 +33,8 @@ class Vmix:
         return vmix_id.hexdigest()
 
     def __get_vmix_api_uri(self):
+        if self.password is None or self.username is None:
+            return 'http://{}:{}/api'.format(self.ip, self.port)
         url_template = 'http://{}:{}@{}:{}/api'
         return url_template.format(self.username,
                                    self.password,

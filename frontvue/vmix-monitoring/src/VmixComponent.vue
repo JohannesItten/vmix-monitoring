@@ -6,9 +6,9 @@
 <template>
   <div class='vmix' :data-id='[vmixId]'>
         <div class='top-bar'>
-          <div class='info'>
-              <i class='fa fa-info' aria-hidden='true'></i>
-              <span class='info-value'></span>
+          <div class='info' :class='[$store.state.vmixes[vmixId].infoCSSClass]'>
+            <div><i class='fa fa-info' aria-hidden='true'></i></div>
+            <div><span class='info-value'>{{ $store.state.vmixes[vmixId].info }}</span></div>
           </div>
           <div class='name' :class='{ red: $store.state.vmixes[vmixId].isOnline }'>
               <span class='name-value'>{{ $store.state.vmixes[vmixId].name }}</span>

@@ -45,8 +45,9 @@ async def handler(websocket):
 
     if 'watch' in action['type']:
         print('watcher connected')
+        print(action['payload']['page'])
         await watch(websocket)
-    elif 'update' in action['type']:
+    elif 'update' or 'error' in action['type']:
         await broadcast_to_watchers(message)
 
 
@@ -68,7 +69,7 @@ def read_configs():
     for vmix in vmixes:
         user_rule = vmix['rule']
         if user_rule not in front_views:
-            continue
+            front_views[user_rule] = None
         vmixes_init_info.append({
             'id': vmix['id'],
             'name': vmix['name'],

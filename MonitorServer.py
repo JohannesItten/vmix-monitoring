@@ -51,7 +51,7 @@ class MonitorServer:
                 api_xml = await response.read()
                 await self.__process_api_response(api_xml, vmix_id)
         except (aiohttp.InvalidURL, aiohttp.ClientConnectorError) as e:
-            print(f'\n{e}\n')
+            await self.__send_error(vmix_id, "Can't connect to {}".format(vmix.api_uri))
             return
 
     async def __process_api_response(self, api_xml, vmix_id):
@@ -66,5 +66,20 @@ class MonitorServer:
                            'id': vmix_id,
                            'name': vmix.name,
                            'isOnline': vmix.state.online,
+                           'errors': vmix.state.errors,
                            'message': vmix.state.snapshot_dump}
+            await connect.send(json.dumps(client_info))
+
+    async def __send_error(self, vmix_id, error_text):
+        vmix = self.vmixes[vmix_id]
+        async with websockets.connect('ws://127.0.0.1:9090') as connect:
+            client_info = {'type': 'error',
+                           'id': vmix_id,
+                           'name': vmix.name,
+                           'isOnline': False,
+                           'message': {
+                               'text': error_text,
+                               'reason': 'monitor',
+                               'type': 'error'
+                           }}
             await connect.send(json.dumps(client_info))

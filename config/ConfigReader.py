@@ -54,6 +54,8 @@ class ConfigReader:
             config_content = yaml.safe_load(config)
         vmixes = {}
         for key, vmix in config_content.items():
+            if 'ip' not in vmix or 'name' not in vmix:
+                continue
             vmix_obj = Vmix.Vmix(
                 name=vmix['name'],
                 unit=vmix['unit'],
@@ -70,7 +72,7 @@ class ConfigReader:
         with open(file=self.CONFIG_DIR + filename, mode='r') as config:
             config_content = yaml.safe_load(config)
         view_elements = {}
-        default_icon = 'fa fa-volume-up'
+        default_icon = 'fa fa-cog'
         default_css_class = 'grey'
         for user_rule, user_elements in config_content.items():
             view_elements[user_rule] = {}
@@ -92,7 +94,7 @@ class ConfigReader:
             config_content = yaml.safe_load(config)
         vmixes = []
         for key, vmix in config_content.items():
-            if 'name' not in vmix or 'rule' not in vmix:
+            if 'name' not in vmix:
                 continue
             vmix_obj = Vmix.Vmix(
                 name=vmix['name'],
