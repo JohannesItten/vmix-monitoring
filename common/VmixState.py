@@ -1,6 +1,5 @@
 import time
-import VmixXMLParser as Parser
-import StateRule
+from common import StateRule, VmixXMLParser as Parser
 
 
 class VmixState:

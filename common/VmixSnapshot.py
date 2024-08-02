@@ -1,5 +1,4 @@
-import VmixInput
-import VmixGlobal
+from common import VmixGlobal, VmixInput
 
 
 class VmixSnapshot:

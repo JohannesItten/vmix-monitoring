@@ -1,8 +1,5 @@
 from lxml import etree
-import VmixBus
-import VmixGlobal
-import VmixInput
-import VmixSnapshot
+from common import VmixBus, VmixGlobal, VmixInput, VmixSnapshot
 
 
 def get_element_attributes(element):

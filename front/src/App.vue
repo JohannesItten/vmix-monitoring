@@ -50,7 +50,7 @@ import {computed, ref} from 'vue'
     socket.onclose = (event) => {
       criticalErrorMessage.value = "Can't establish connection with WebSocket Server";
       console.log('Connection closed: ', event);
-      if(waitTimer < 60000) waitTimer = waitTimer * multiplier;
+      if (waitTimer < 60000) waitTimer = waitTimer * multiplier;
       setTimeout(()=>{startSocket(socket.url, waitTimer, waitSeed, multiplier)}, waitTimer);
     }
 

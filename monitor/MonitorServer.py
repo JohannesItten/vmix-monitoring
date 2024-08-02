@@ -4,7 +4,7 @@ from time import time
 import json
 import websockets
 import sys
-import config.ConfigReader as ConfigReader
+import common.ConfigReader as ConfigReader
 
 
 class MonitorServer:
@@ -58,7 +58,7 @@ class MonitorServer:
 
     async def __process_api_response(self, api_xml, vmix_id):
         vmix = self.vmixes[vmix_id]
-        snapshot_dump = vmix.process_xml_snapshot(api_xml, self.user_rules[vmix.rule_name])
+        vmix.process_xml_snapshot(api_xml, self.user_rules[vmix.rule_name])
         await self.__send_state(vmix_id)
 
     async def __send_state(self, vmix_id):

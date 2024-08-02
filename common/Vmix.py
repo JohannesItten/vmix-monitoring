@@ -1,6 +1,5 @@
 import hashlib
-import VmixState as VmixState
-import config.ConfigReader as ConfigReader
+import common.VmixState as VmixState
 
 DEFAULT_PORT = '8088'
 

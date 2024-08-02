@@ -1,4 +1,4 @@
-import config.ConfigReader as reader
+import common.ConfigReader as reader
 
 
 def main():

@@ -1,7 +1,6 @@
 import yaml
-import StateRule
-import Vmix
-from UserRuleDictionary import RULES_DICTIONARY, INVERT_RESULT_KEY
+from common import StateRule, Vmix
+from common.UserRuleDictionary import RULES_DICTIONARY, INVERT_RESULT_KEY
 
 
 def translate_rules(rule_list) -> list:
