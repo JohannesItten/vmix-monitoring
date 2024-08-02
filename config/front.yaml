@@ -7,10 +7,10 @@ test:
     icon: fa fa-youtube-play
   master:
     text: M
-    icon: fa fa-bus
+    icon:
   busG:
     text: G
-    icon: fa fa-bus
+    icon:
   audiokey:
     text: AUDIO
     icon: fa fa-volume-up

@@ -39,7 +39,7 @@ class MonitorServer:
                 for vmix_id in self.vmixes:
                     task = asyncio.create_task(self.__get_api_response(session, vmix_id))
                     tasks.append(task)
-                await asyncio.gather(*tasks, return_exceptions=True)
+                await asyncio.gather(*tasks, return_exceptions=False)
                 print("\nParsing cycle time:", time() - time_start)
                 tasks.clear()
                 await asyncio.sleep(self.repeat_every)
@@ -50,7 +50,9 @@ class MonitorServer:
             async with session.get(vmix.api_uri) as response:
                 api_xml = await response.read()
                 await self.__process_api_response(api_xml, vmix_id)
-        except (aiohttp.InvalidURL, aiohttp.ClientConnectorError) as e:
+        except (aiohttp.InvalidURL,
+                aiohttp.ClientConnectorError,
+                aiohttp.ServerTimeoutError) as e:
             await self.__send_error(vmix_id, "Can't connect to {}".format(vmix.api_uri))
             return
 
@@ -61,25 +63,31 @@ class MonitorServer:
 
     async def __send_state(self, vmix_id):
         vmix = self.vmixes[vmix_id]
-        async with websockets.connect('ws://127.0.0.1:9090') as connect:
-            client_info = {'type': 'update',
-                           'id': vmix_id,
-                           'name': vmix.name,
-                           'isOnline': vmix.state.online,
-                           'errors': vmix.state.errors,
-                           'message': vmix.state.snapshot_dump}
-            await connect.send(json.dumps(client_info))
+        try:
+            async with websockets.connect('ws://127.0.0.1:9090') as connect:
+                client_info = {'type': 'update',
+                               'id': vmix_id,
+                               'name': vmix.name,
+                               'isOnline': vmix.state.online,
+                               'errors': vmix.state.errors,
+                               'message': vmix.state.snapshot_dump}
+                await connect.send(json.dumps(client_info))
+        except ConnectionRefusedError:
+            print("Can't connect ws server")
 
     async def __send_error(self, vmix_id, error_text):
         vmix = self.vmixes[vmix_id]
-        async with websockets.connect('ws://127.0.0.1:9090') as connect:
-            client_info = {'type': 'error',
-                           'id': vmix_id,
-                           'name': vmix.name,
-                           'isOnline': False,
-                           'message': {
-                               'text': error_text,
-                               'reason': 'monitor',
-                               'type': 'error'
-                           }}
-            await connect.send(json.dumps(client_info))
+        try:
+            async with websockets.connect('ws://127.0.0.1:9090') as connect:
+                client_info = {'type': 'error',
+                               'id': vmix_id,
+                               'name': vmix.name,
+                               'isOnline': False,
+                               'message': {
+                                   'text': error_text,
+                                   'reason': 'monitor',
+                                   'type': 'error'
+                               }}
+                await connect.send(json.dumps(client_info))
+        except ConnectionRefusedError:
+            print("Can't connect to ws server")

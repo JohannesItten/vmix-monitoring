@@ -15,7 +15,6 @@ test:
   always: [
     [inputBus,[audiokey, MABC],error],
     [/external,[],warning],
-    [preset,[],info],
     [multiCorder,[],info],
     [fullscreen,[],info],
   ]

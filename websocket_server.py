@@ -27,7 +27,12 @@ async def watch(websocket):
             'type': 'init',
             'message': vmixes_init_info
          }))
-    await asyncio.Event().wait()
+    try:
+        await websocket.wait_closed()
+    finally:
+        print('watcher removed')
+        watchers.remove(websocket)
+    # await asyncio.Event().wait()
 
 
 async def broadcast_to_watchers(message):

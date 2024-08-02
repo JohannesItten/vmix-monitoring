@@ -29,37 +29,48 @@ import {computed, ref} from 'vue'
 
   const currentPage = getURLPage();
 
-  const socket = new WebSocket(serverURI);
-  socket.onopen = (event) => {
-    criticalErrorMessage.value = null;
-    console.log('Connection opened');
-    socket.send(JSON.stringify(
-      {type: 'watch', payload: {'page': currentPage}}
-    ));
-  };
-  socket.onerror = (event) => {
-    criticalErrorMessage.value = "Can't establish connection with WebSocket Server";
-    console.log('Connection error: ', event);
-  };
-  socket.onclose = (event) => {
-    criticalErrorMessage.value = "Can't connect to WebSocket Server";
-    console.log('Connection closed');
-  };
-  socket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    switch (message.type)
-    {
-      case 'update':
-        processMessage(message);
-        break;
-      case 'init':
-        processInit(message);
-        break;
-      case 'error':
-        processMonitorError(message);
-        break;
+
+  const startSocket = (wsURL, waitTimer, waitSeed, multiplier) => {
+    let socket = new WebSocket(wsURL);
+
+    socket.onopen = (event) => {
+        criticalErrorMessage.value = null;
+        console.log('Connection opened');
+        socket.send(JSON.stringify(
+          {type: 'watch', payload: {'page': currentPage}}
+        ));
+        waitTimer = waitSeed;
+    };
+
+    socket.onerror = (event) => {
+      criticalErrorMessage.value = "Can't establish connection with WebSocket Server";
+      console.log('Connection error: ', event);
     }
-  };
+
+    socket.onclose = (event) => {
+      criticalErrorMessage.value = "Can't establish connection with WebSocket Server";
+      console.log('Connection closed: ', event);
+      if(waitTimer < 60000) waitTimer = waitTimer * multiplier;
+      setTimeout(()=>{startSocket(socket.url, waitTimer, waitSeed, multiplier)}, waitTimer);
+    }
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      switch (message.type)
+      {
+        case 'update':
+          processMessage(message);
+          break;
+        case 'init':
+          processInit(message);
+          break;
+        case 'error':
+          processMonitorError(message);
+          break;
+      }
+    };
+  }
+  startSocket(serverURI, 1000, 1000, 2)
 
   const processInit = (message) => {
     store.commit('init', message.message);
@@ -87,36 +98,3 @@ import {computed, ref} from 'vue'
 </script>
 <style>
 </style>
-
-<!-- //wsURL - the string URL of the websocket
-//waitTimer - the incrementing clock to use if no connection made
-//waitSeed - used to reset the waitTimer back to default on a successful connection
-//multiplier - how quickly you want the timer to grow on each unsuccessful connection attempt
-
-const openSocket = (wsURL, waitTimer, waitSeed, multiplier) =>{
-  let ws = new WebSocket(wsURL);
-  console.log(`trying to connect to: ${ws.url}`);
-
-  ws.onopen = () => {
-      console.log(`connection open to: ${ws.url}`);
-      waitTimer = waitSeed; //reset the waitTimer if the connection is made
-      
-      ws.onclose = () => {
-        console.log(`connection closed to: ${ws.url}`);
-        openSocket(ws.url, waitTimer, waitSeed, multiplier);
-      };
-      
-      ws.onmessage = (message) => {
-        //do something with messge...
-      };
-  };
-  
-  ws.onerror = () => {
-    //increaese the wait timer if not connected, but stop at a max of 2n-1 the check time
-    if(waitTimer < 60000) waitTimer = waitTimer * multiplier; 
-    console.log(`error opening connection ${ws.url}, next attemp in : ${waitTimer/1000} seconds`);
-    setTimeout(()=>{openSocket(ws.url, waitTimer, waitSeed, multiplier)}, waitTimer);
-  }
-}
-
-openSocket(`ws://localhost:3000`, 1000, 1000, 2 -->

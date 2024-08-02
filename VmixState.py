@@ -28,6 +28,13 @@ class VmixState:
         self.snapshot_dump = self.snapshot.dump()
 
     def __check_state(self, rules):
+        is_preset = self.is_preset_ok()
+        if not is_preset['result']:
+            error_text = 'The vMix preset does not contain the required keys'
+            self.errors['parsing'].append(
+                '{} ({})'.format(error_text, is_preset['info'])
+            )
+            return
         for rule in rules:
             if rule is None:
                 continue
@@ -49,6 +56,8 @@ class VmixState:
             self.errors[error_verbosity].append(error_description)
 
     def __is_online(self):
+        if self.snapshot.active_input is None:
+            return False
         active_title = self.snapshot.active_input.title
         idle_keys = self.rule.idle_keys
         return not any(s in active_title for s in idle_keys)
