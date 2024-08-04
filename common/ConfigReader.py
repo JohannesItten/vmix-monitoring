@@ -1,6 +1,7 @@
 import yaml
-from common import StateRule, Vmix
-from common.UserRuleDictionary import RULES_DICTIONARY, INVERT_RESULT_KEY
+from common import Vmix
+from common.rule import CheckRulesStorage, CheckRule
+from common.rule.CheckRuleDictionary import RULES_DICTIONARY, INVERT_RESULT_KEY
 
 
 def translate_rules(rule_list) -> list:
@@ -13,14 +14,19 @@ def translate_rules(rule_list) -> list:
             expected_result = False
         if func_name not in RULES_DICTIONARY:
             continue
-        real_rule = RULES_DICTIONARY[func_name]
-        real_rules.append({
-            'function': real_rule[0],
-            'args': user_rule[1],
-            'expected_result': expected_result,
-            'error_verbosity': user_rule[2],
-            'error_description': real_rule[1] if expected_result else real_rule[2]
-        })
+        translated_rule = RULES_DICTIONARY[func_name]
+        if expected_result:
+            error_description = translated_rule['onFalse']
+        else:
+            error_description = translated_rule['onTrue']
+        real_rule = CheckRule.CheckRule(
+            function=translated_rule['func'],
+            args=user_rule[1],
+            expected_result=expected_result,
+            error_verbosity=user_rule[2],
+            error_description=error_description
+        )
+        real_rules.append(real_rule)
     return real_rules
 
 
@@ -36,7 +42,7 @@ class ConfigReader:
         with open(file=self.CONFIG_DIR + filename, mode='r') as config:
             config_content = yaml.safe_load(config)
         for name, rule in config_content.items():
-            state_rule = StateRule.StateRule(
+            state_rule = CheckRulesStorage.CheckRulesStorage(
                 name=name,
                 idle_keys=rule['idle'],
                 inputs_keys=rule['watch'] + rule['idle'],

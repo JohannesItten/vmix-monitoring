@@ -1,8 +1,8 @@
-import common.ConfigReader as reader
+import common.ConfigReader as ConfigReader
 
 
 def main():
-    r = reader.ConfigReader()
+    r = ConfigReader.ConfigReader()
     # print(r.read_front('front.yaml'))
     print(r.read_vmixes_ws('vmixes.yaml'))
 

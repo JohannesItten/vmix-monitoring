@@ -1,4 +1,7 @@
-class StateRule:
+from common.rule.CheckRule import CheckRule
+
+
+class CheckRulesStorage:
     def __init__(self,
                  name: str,
                  idle_keys: dict,

@@ -57,15 +57,15 @@ class VmixXMLParser:
     # necessary for monitoring
     def __get_global_elements(self) -> VmixGlobal:
         root = self.xml_root
-        globals = {}
+        vmix_globals = {}
         for element in root.getchildren():
             if len(element.getchildren()) > 0:
                 continue
-            globals[element.tag] = {
+            vmix_globals[element.tag] = {
                 'value': element.text,
                 'props': get_element_attributes(element)
             }
-        return VmixGlobal.VmixGlobal(globals)
+        return VmixGlobal.VmixGlobal(vmix_globals)
 
     # store attributes like meterF1, meterF2:
     # {meterF:
@@ -80,17 +80,17 @@ class VmixXMLParser:
         return nested_root
 
     # list of keys/guid's of input multiview overlays
-    def __get_input_overlays(self, input) -> list:
+    def __get_input_overlays(self, vmix_input) -> list:
         input_overlays = []
-        for element in input.findall(self.INPUT_OVERLAY_TAG):
+        for element in vmix_input.findall(self.INPUT_OVERLAY_TAG):
             input_overlays.append(element.get('key'))
         return input_overlays
 
     # text fields of input type=GT
     # {'name': 'text value'}
-    def __get_input_texts(self, input) -> dict:
+    def __get_input_texts(self, vmix_input) -> dict:
         input_texts = {}
-        for element in input.findall(self.INPUT_TEXT_TAG):
+        for element in vmix_input.findall(self.INPUT_TEXT_TAG):
             text_name = element.get('name')
             input_texts[text_name] = element.text
         return input_texts
@@ -117,18 +117,18 @@ class VmixXMLParser:
         input_number = input_number - 1
         inputs = self.__get_nested_root(self.INPUTS_ROOT_TAG)
         try:
-            input = inputs[input_number]
+            vmix = inputs[input_number]
         except IndexError:
             return None
 
-        input_attributes = get_element_attributes(input)
+        input_attributes = get_element_attributes(vmix)
         input_obj = VmixInput.VmixInput(
             number=input_attributes['number'],
             key=input_attributes['key'],
             title=input_attributes['title'],
             vmix_type=input_attributes['type'],
-            overlays=self.__get_input_overlays(input),
-            texts=self.__get_input_texts(input),
+            overlays=self.__get_input_overlays(vmix),
+            texts=self.__get_input_texts(vmix),
             props=input_attributes
         )
         return input_obj
@@ -140,8 +140,8 @@ class VmixXMLParser:
         if input_root is None:
             return {}
 
-        for input in input_root.getchildren():
-            input_attributes = get_element_attributes(input)
+        for vmix_input in input_root.getchildren():
+            input_attributes = get_element_attributes(vmix_input)
             input_title = input_attributes['title']
             input_number = int(input_attributes['number'])
 
@@ -153,8 +153,8 @@ class VmixXMLParser:
                     key=input_attributes['key'],
                     title=input_title,
                     vmix_type=input_attributes['type'],
-                    overlays=self.__get_input_overlays(input),
-                    texts=self.__get_input_texts(input),
+                    overlays=self.__get_input_overlays(vmix_input),
+                    texts=self.__get_input_texts(vmix_input),
                     props=input_attributes,
                     user_key=key
                 )

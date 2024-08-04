@@ -36,6 +36,6 @@ class VmixSnapshot:
             'active': active,
             'buses': buses,
             'inputs': inputs,
-            'overlays': {},
+            'overlays': overlays,
             'mixes': mixes
         }

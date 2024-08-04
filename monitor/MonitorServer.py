@@ -52,7 +52,7 @@ class MonitorServer:
                 await self.__process_api_response(api_xml, vmix_id)
         except (aiohttp.InvalidURL,
                 aiohttp.ClientConnectorError,
-                aiohttp.ServerTimeoutError) as e:
+                aiohttp.ServerTimeoutError):
             await self.__send_error(vmix_id, "Can't connect to {}".format(vmix.api_uri))
             return
 

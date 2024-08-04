@@ -1,8 +1,8 @@
 class VmixGlobal:
     PROP_NOT_FOUND = None
 
-    def __init__(self, globals: dict):
-        self.globals = globals
+    def __init__(self, vmix_globals: dict):
+        self.globals = vmix_globals
 
     def dump(self):
         return self.globals

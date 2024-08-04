@@ -40,7 +40,9 @@ class Vmix:
                                    self.ip,
                                    self.port)
 
-    def process_xml_snapshot(self, xml_snapshot, rule):
-        state = VmixState.VmixState(xml_snapshot=xml_snapshot, rule=rule)
-        state.update_state()
-        self.state = state
+    def process_xml_snapshot(self, xml_snapshot, rules):
+        if self.state is None:
+            state = VmixState.VmixState(xml_snapshot=xml_snapshot, rules=rules)
+            self.state = state
+        self.state.xml_snapshot = xml_snapshot
+        self.state.update_state()

@@ -1,7 +1,10 @@
-websockets
+websockets~=12.0
 fastapi
 jinja2
 uvicorn[standard]
 xmltodict
-aiohttp
-asyncio
+aiohttp~=3.9.5
+asyncio~=3.4.3
+
+PyYAML~=6.0.1
+lxml~=5.2.2

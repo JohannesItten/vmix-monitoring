@@ -44,7 +44,8 @@ class VmixBus:
         for key, amp in amplitude.items():
             amp = float(amp)
             if amp <= 0:
-                dbfs.append("-inf")
+                # -inf
+                dbfs.append(-10000)
                 continue
             dbfs_val = 20 * math.log10(amp)
             dbfs.append(round(dbfs_val, 3))

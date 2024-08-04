@@ -3,18 +3,9 @@ test:
   watch: [testkey, multikey, audiokey]
   buses: [M, A, B]
   online: [
-    [streaming,[],error],
-    [recording,[],info],
-    [/busMuted,[A],info],
-    [/inputMuted, [audiokey], error],
+    [/busLevelLow, [M, -9, 10], error]
   ]
   offline: [
-    [busMuted,[A], info],
-    [inputMuted,[audiokey], error]
   ]
   always: [
-    [inputBus,[audiokey, MABC],error],
-    [/external,[],warning],
-    [multiCorder,[],info],
-    [fullscreen,[],info],
   ]
