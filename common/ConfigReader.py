@@ -16,9 +16,9 @@ def translate_rules(rule_list) -> list:
             continue
         translated_rule = RULES_DICTIONARY[func_name]
         if expected_result:
-            error_description = translated_rule['onFalse']
-        else:
             error_description = translated_rule['onTrue']
+        else:
+            error_description = translated_rule['onFalse']
         real_rule = CheckRule.CheckRule(
             function=translated_rule['func'],
             args=user_rule[1],

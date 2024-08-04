@@ -7,6 +7,11 @@ from signal import signal, SIGINT, SIGTERM
 import common.ConfigReader as ConfigReader
 
 
+def exit_handler(signal_received, frame):
+    print('\nShutting down server...\n')
+    sys.exit(0)
+
+
 class WebsocketServer:
     def __init__(self,
                  host: str,
@@ -23,14 +28,10 @@ class WebsocketServer:
         self.__read_configs()
 
     def run(self):
-        signal(SIGINT, self.__exit_handler)
+        signal(SIGINT, exit_handler)
         if self.is_mustdie:
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(self.__main())
-
-    def __exit_handler(self, signal_received, frame):
-        print('\nShutting down server...\n')
-        sys.exit(0)
 
     async def __watch(self, websocket):
         self.watchers.add(websocket)

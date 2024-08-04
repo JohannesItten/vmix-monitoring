@@ -73,7 +73,7 @@ class MonitorServer:
                                'message': vmix.state.snapshot_dump}
                 await connect.send(json.dumps(client_info))
         except ConnectionRefusedError:
-            print("Can't connect ws server")
+            print("Can't connect to ws server")
 
     async def __send_error(self, vmix_id, error_text):
         vmix = self.vmixes[vmix_id]

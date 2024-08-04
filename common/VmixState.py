@@ -1,5 +1,5 @@
 import time
-from common import CheckResultStorage, VmixXMLParser as Parser
+from common import CheckResultStorage, TimeDepCheckResult, VmixXMLParser as Parser
 from common.rule import CheckRulesStorage
 
 
@@ -31,7 +31,7 @@ class VmixState:
         current_online_state = self.__is_online()
         if current_online_state != self.online:
             self.is_online_changed = True
-            # stop checking time dependent values on online state change
+            # stop run time dependent checks on online state change
             self.check_results.reset_except_always()
         self.online = current_online_state
         check_rules = self.rules.online if self.online else self.rules.offline
@@ -61,13 +61,15 @@ class VmixState:
             if rule is None:
                 continue
             function = getattr(self, rule.function)
-            print(*rule.args)
             function_result = function(*rule.args)
             function_result_value = function_result['result']
             function_result_info = function_result['info']
             if function_result_value is None:
                 self.errors['parsing'].append(function_result_info)
                 continue
+            if ('max_time' in function_result and
+                    function_result['max_time'] > function_result['delta_time']):
+                function_result_value = rule.expected_result
             if function_result_value == rule.expected_result:
                 continue
             error_verbosity = rule.error_verbosity
@@ -159,7 +161,7 @@ class VmixState:
         except (TypeError, ValueError):
             return {
                 'result': None,
-                'info': f'Input has no sound enabled ({input_key})'
+                'info': f'Input has no sound at all({input_key})'
             }
         result = is_muted or volume_bar == 0
         return {
@@ -196,13 +198,18 @@ class VmixState:
         cut_delta_time = self.check_results.add_result(
             func='is_cut_frequency_ok',
             args=[max_delta_time],
-            result=self.snapshot.active_input)
+            value=self.snapshot.active_input)
         return {
             'result': cut_delta_time < max_delta_time,
             'info': f'Last cut was {int(cut_delta_time)}s ago'
         }
 
     def is_bus_level_low(self, bus_short_name, low_level, low_max_time):
+        if bus_short_name not in self.snapshot.buses.keys():
+            return {
+                'result': None,
+                'info': f'Input not found in preset ({bus_short_name})'
+            }
         bus = self.snapshot.buses[bus_short_name]
         is_level_low = False
         for dbfs in bus.dbfs:
@@ -210,16 +217,48 @@ class VmixState:
                 continue
             is_level_low = True
 
-        low_delta_time = self.check_results.add_result(
+        delta_time = self.check_results.add_result(
             func='is_bus_level_low',
             args=[bus_short_name, low_level, low_max_time],
-            result=is_level_low
+            value=is_level_low
         )
-
         return {
-            'result': low_delta_time > low_max_time and is_level_low,
-            'info': f'{bus_short_name}'
+            'result': is_level_low,
+            'info': bus_short_name,
+            'max_time': low_max_time,
+            'delta_time': delta_time
         }
 
-    def __input_level_low(self):
-        pass
+    def is_input_level_low(self, input_key, low_level, low_max_time):
+        if input_key not in self.snapshot.inputs.keys():
+            return {
+                'result': None,
+                'info': f'Input not found in preset ({input_key})'
+            }
+        vmix_input = self.snapshot.inputs[input_key]
+        is_muted = vmix_input.get_prop('muted')
+        if is_muted is None:
+            return {
+                'result': None,
+                'info': f'Input has no sound at all ({input_key})'
+            }
+
+        is_muted = eval(is_muted)
+        is_level_low = False
+        for dbfs in vmix_input.dbfs:
+            if dbfs >= low_level:
+                continue
+            is_level_low = True
+
+        check_result = is_level_low or is_muted
+        delta_time = self.check_results.add_result(
+            func='is_input_level_low',
+            args=[input_key, low_level, low_max_time],
+            value=check_result
+        )
+        return {
+            'result': check_result,
+            'info': input_key,
+            'max_time': low_max_time,
+            'delta_time': delta_time
+        }

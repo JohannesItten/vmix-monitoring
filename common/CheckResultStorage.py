@@ -16,13 +16,14 @@ class CheckResultStorage:
         # result_id's for funcs in user rules, tagged as always
         self.always_ids = []
 
-    def add_result(self, func, args, result):
+    def add_result(self, func, args, value):
         result_id = get_result_id(func, args)
         if result_id in self.storage.keys():
-            return self.storage[result_id].update(result)
+            self.storage[result_id].update(value)
+            return self.storage[result_id].delta_time
         self.storage[result_id] = CheckResult.TimeDepCheckResult(
             result_id=result_id,
-            result=result
+            value=value
         )
         return 0
 
@@ -37,4 +38,4 @@ class CheckResultStorage:
         for result_id in self.storage.keys():
             if result_id in self.always_ids:
                 continue
-            self.storage[result_id].reset_result()
+            self.storage[result_id].reset_value()

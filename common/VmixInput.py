@@ -15,6 +15,8 @@ class VmixInput:
         self.texts = texts
         self.props = props
         self.user_key = user_key
+        self.volume = self.__get_volume()
+        self.dbfs = self.__get_dbfs()
 
     # if same key(guid) means same input
     def __eq__(self, other):
@@ -54,3 +56,20 @@ class VmixInput:
             volume_val = math.pow(amp, 0.25) * 100
             volume.append(round(volume_val, 3))
         return volume
+
+    def __get_dbfs(self) -> list:
+        amplitude = self.get_prop(self.PROP_AMPLITUDE)
+        if type(amplitude) is not dict:
+            return []
+        dbfs = []
+        for key, amp in amplitude.items():
+            amp = float(amp)
+            if amp <= 0:
+                # -inf
+                dbfs.append(-10000)
+                continue
+            dbfs_val = 20 * math.log10(amp)
+            dbfs.append(round(dbfs_val, 3))
+        return dbfs
+
+

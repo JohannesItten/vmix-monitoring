@@ -25,6 +25,8 @@ class VmixSnapshot:
         for user_key, vmix_input in self.inputs.items():
             inputs[user_key] = vmix_input.dump()
         overlays = {}
+        for overlay_number, vmix_input in self.overlays.items():
+            overlays[overlay_number] = vmix_input.dump()
         mixes = {}
         for mix_number, active_input in self.mixes.items():
             if active_input is None:

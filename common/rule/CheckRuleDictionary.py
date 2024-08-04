@@ -59,7 +59,7 @@ RULES_DICTIONARY = {
     },
     'inputLevelLow': {
         'func': 'is_input_level_low',
-        'onTrue': 'The input level is low',
-        'onFalse': 'The input level is NOT low'
+        'onTrue': 'The input level is NOT low',
+        'onFalse': 'The input level is low'
     }
 }

@@ -1,9 +1,10 @@
 test:
   idle: [zastkey, shapkakey]
-  watch: [testkey, multikey, audiokey]
+  watch: [testkey, multikey, audiokey, timelapse]
   buses: [M, A, B]
   online: [
-    [/busLevelLow, [M, -9, 10], error]
+    [inputLevelLow, [timelapse, -18, 10], warning],
+    [streaming, [], warning]
   ]
   offline: [
   ]

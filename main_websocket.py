@@ -3,7 +3,7 @@ import websocket.WebsocketServer as WebsocketServer
 
 def main():
     websocket_server = WebsocketServer.WebsocketServer(
-        host='0.0.0.0',
+        host='localhost',
         port='9090',
         is_global=False,
         is_mustdie=False

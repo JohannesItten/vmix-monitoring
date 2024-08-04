@@ -138,7 +138,12 @@ body
 
 .green
 {
-  background-color: #00CC33;
+  background-color: #00CC33 !important;
+}
+
+.yellow
+{
+  background-color: #FF9900 !important;
 }
 
 .grey
