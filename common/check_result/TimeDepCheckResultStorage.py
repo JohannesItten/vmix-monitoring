@@ -1,4 +1,4 @@
-import common.TimeDepCheckResult as CheckResult
+import common.check_result.TimeDepCheckResult as CheckResult
 
 
 def get_result_id(func, args):
@@ -10,7 +10,7 @@ def get_result_id(func, args):
     return result_id
 
 
-class CheckResultStorage:
+class TimeDepCheckResultStorage:
     def __init__(self):
         self.storage = {}
         # result_id's for funcs in user rules, tagged as always

@@ -1,6 +1,7 @@
 import time
-from common import CheckResultStorage, TimeDepCheckResult, VmixXMLParser as Parser
+from common import VmixXMLParser as Parser
 from common.rule import CheckRulesStorage
+from common.check_result import TimeDepCheckResultStorage as ResultStorage
 
 
 class VmixState:
@@ -20,7 +21,7 @@ class VmixState:
         self.is_online_changed = False
         # stores check result updates and update times
         # need for checking value changes, during time
-        self.check_results = CheckResultStorage.CheckResultStorage()
+        self.check_results = ResultStorage.TimeDepCheckResultStorage()
         self.check_results.add_always_ids(self.rules.always)
 
     def update_state(self):

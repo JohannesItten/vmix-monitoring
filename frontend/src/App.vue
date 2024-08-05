@@ -8,13 +8,11 @@
   </div>
 </template>
 <script setup>
-import store from './store'
-import {computed, ref} from 'vue'
+  import store from './store'
+  import {computed, ref, onMounted} from 'vue'
 
-// TODO: get currentPage from GET, serverURI from config
   const vmixes = ref({});
   const criticalErrorMessage = ref(null);
-  const serverURI = 'ws://localhost:9090'; 
 
   const isErrorDisplay = computed(() => {
     let cssDisplay = 'display: grid';
@@ -22,34 +20,28 @@ import {computed, ref} from 'vue'
     return cssDisplay
   });
 
-  const getURLPage = () => {
-    let urlParams = new URLSearchParams(document.location.search);
-    return urlParams.get('page');
-  }
-
-  const currentPage = getURLPage();
-
+  let urlParams = new URLSearchParams(document.location.search);
+  const currentPage = urlParams.get('page');
+  const serverURI = urlParams.get('server');
 
   const startSocket = (wsURL, waitTimer, waitSeed, multiplier) => {
     let socket = new WebSocket(wsURL);
 
     socket.onopen = (event) => {
         criticalErrorMessage.value = null;
-        console.log('Connection opened');
         socket.send(JSON.stringify(
           {type: 'watch', payload: {'page': currentPage}}
         ));
+        console.log('Page: ' + currentPage);
         waitTimer = waitSeed;
     };
 
     socket.onerror = (event) => {
       criticalErrorMessage.value = "Can't establish connection with WebSocket Server";
-      console.log('Connection error: ', event);
     }
 
     socket.onclose = (event) => {
       criticalErrorMessage.value = "Can't establish connection with WebSocket Server";
-      console.log('Connection closed: ', event);
       if (waitTimer < 60000) waitTimer = waitTimer * multiplier;
       setTimeout(()=>{startSocket(socket.url, waitTimer, waitSeed, multiplier)}, waitTimer);
     }
@@ -70,7 +62,10 @@ import {computed, ref} from 'vue'
       }
     };
   }
-  startSocket(serverURI, 1000, 1000, 2)
+
+  onMounted(() => {
+      startSocket(serverURI, 1000, 1000, 2);
+  })
 
   const processInit = (message) => {
     store.commit('init', message.message);

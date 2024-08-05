@@ -131,4 +131,5 @@ dmypy.json
 
 #PyCharm
 .idea
+.tmp
 qodana.yaml

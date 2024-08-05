@@ -33,11 +33,11 @@ class WebsocketServer:
             asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(self.__main())
 
-    async def __watch(self, websocket):
+    async def __watch(self, websocket, watcher_page):
         self.watchers.add(websocket)
         await websocket.send(json.dumps({
             'type': 'init',
-            'message': self.vmixes_init_info
+            'message': self.__get_page(9, watcher_page)
         }))
         try:
             await websocket.wait_closed()
@@ -60,8 +60,10 @@ class WebsocketServer:
 
         if 'watch' in action['type']:
             print('watcher connected')
-            print(action['payload']['page'])
-            await self.__watch(websocket)
+            watcher_page = 1
+            if 'page' in action['payload']:
+                watcher_page = action['payload']['page']
+            await self.__watch(websocket, watcher_page)
         elif 'update' or 'error' in action['type']:
             await self.__broadcast_to_watchers(message)
 
@@ -88,3 +90,16 @@ class WebsocketServer:
                 'name': vmix['name'],
                 'view': front_views[user_rule],
             })
+
+    def __get_page(self, page_amount, page_number=1):
+        try:
+            page_number = int(page_number)
+        except (ValueError, TypeError):
+            page_number = 1
+        vmixes = self.vmixes_init_info
+        page_vmixes_max = min([len(vmixes), page_amount * page_number])
+
+        page_vmixes = []
+        for i in range(page_number * page_amount - page_amount, page_vmixes_max):
+            page_vmixes.append(vmixes[i])
+        return page_vmixes

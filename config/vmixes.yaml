@@ -9,7 +9,7 @@ vmix-testmon:
   rule: test
 
 vmix-test2:
-  name: skiptest
+  name: 222
   unit: Sidorov
   ip: 127.0.0.1
   port:
@@ -19,8 +19,98 @@ vmix-test2:
 
 vmix-test3:
   name: configtest
-  unit: kkk
+  unit: 333
   ip: 192.168.10.255
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test4:
+  name: 444
+  unit: Sidorov
+  ip: 127.0.0.2
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test5:
+  name: 555
+  unit: Sidorov
+  ip: 127.0.0.3
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test6:
+  name: 666
+  unit: Sidorov
+  ip: 127.0.0.4
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test7:
+  name: 777
+  unit: Sidorov
+  ip: 127.0.0.5
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test8:
+  name: 888
+  unit: Sidorov
+  ip: 127.0.0.5
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test9:
+  name: 999
+  unit: Sidorov
+  ip: 127.0.0.5
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test10:
+  name: 101010
+  unit: Sidorov
+  ip: 127.0.0.5
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test11:
+  name: 111111
+  unit: Sidorov
+  ip: 127.0.0.5
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test12:
+  name: 121212
+  unit: Sidorov
+  ip: 127.0.0.5
+  port:
+  username:
+  password:
+  rule:
+
+vmix-test13:
+  name: 131313
+  unit: Sidorov
+  ip: 127.0.0.5
   port:
   username:
   password:
