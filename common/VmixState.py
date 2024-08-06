@@ -51,7 +51,8 @@ class VmixState:
             error_description = f'{error_text} ({is_preset["info"]})'
             self.errors.add_error('is_preset', error_description, 'parsing')
             return
-        self.errors.remove_error('is_preset')
+        if 'is_preset' in self.errors.storage:
+            self.fixed_errors.append(self.errors.remove_error('is_preset'))
         for rule in rules:
             if rule is None:
                 continue

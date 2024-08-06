@@ -16,7 +16,7 @@ function getInfoCSSClass(level)
 {
     switch(level)
     {
-        case 10:
+        case 100:
         case 3:
             return redClass;
         case 2:

@@ -54,9 +54,9 @@ class Vmix:
         if len(previous_errors) == 0:
             self.new_errors = list(current_errors.values())
             return
-        prev_keys = previous_errors.keys()
-        current_keys_set = set(current_errors.keys())
-        new_errors_keys = [x for x in prev_keys if x not in current_keys_set]
+        prev_keys = set(previous_errors.keys())
+        current_keys = set(current_errors.keys())
+        new_errors_keys = prev_keys.symmetric_difference(current_keys)
         for key in new_errors_keys:
-            if key in current_keys_set:
+            if key in current_keys:
                 self.new_errors.append(current_errors[key])
