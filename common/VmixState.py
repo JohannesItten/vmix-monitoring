@@ -2,6 +2,7 @@ import time
 from common import VmixXMLParser as Parser
 from common.rule import CheckRulesStorage
 from common.check_result import TimeDepCheckResultStorage as ResultStorage
+from common.check_error import CheckErrorStorage as ErrorStorage
 
 
 class VmixState:
@@ -9,12 +10,8 @@ class VmixState:
         self.xml_snapshot = xml_snapshot
         self.rules = rules
         self.snapshot = None
-        self.errors = {
-            'parsing': [],
-            'error': [],
-            'warning': [],
-            'info': []
-        }
+        self.errors = ErrorStorage.CheckErrorStorage()
+        self.fixed_errors = []
         self.last_update = int(time.time())
         self.snapshot_dump = None
         self.online = None
@@ -30,7 +27,8 @@ class VmixState:
         self.snapshot = parser.parse()
         self.__check_state(self.rules.always)
         current_online_state = self.__is_online()
-        if current_online_state != self.online:
+        if (current_online_state != self.online and
+                self.online is not None):
             self.is_online_changed = True
             # stop run time dependent checks on online state change
             self.check_results.reset_except_always()
@@ -38,14 +36,10 @@ class VmixState:
         check_rules = self.rules.online if self.online else self.rules.offline
         self.__check_state(check_rules)
         self.snapshot_dump = self.snapshot.dump()
+        self.errors.sort()
 
     def __reinit_state(self):
-        self.errors = {
-            'parsing': [],
-            'error': [],
-            'warning': [],
-            'info': []
-        }
+        self.fixed_errors = []
         self.last_update = int(time.time())
         self.is_online_changed = False
 
@@ -54,10 +48,10 @@ class VmixState:
         # All checks from user rules are not valid if preset check is failed
         if not is_preset['result']:
             error_text = 'The vMix preset does not contain the required keys'
-            self.errors['parsing'].append(
-                f'{error_text} ({is_preset["info"]})'
-            )
+            error_description = f'{error_text} ({is_preset["info"]})'
+            self.errors.add_error('is_preset', error_description, 'parsing')
             return
+        self.errors.remove_error('is_preset')
         for rule in rules:
             if rule is None:
                 continue
@@ -66,20 +60,20 @@ class VmixState:
             function_result_value = function_result['result']
             function_result_info = function_result['info']
             if function_result_value is None:
-                self.errors['parsing'].append(function_result_info)
+                self.errors.add_error(rule.id, function_result_info, 'parsing')
                 continue
             if ('max_time' in function_result and
                     function_result['max_time'] > function_result['delta_time']):
                 function_result_value = rule.expected_result
             if function_result_value == rule.expected_result:
+                if rule.id in self.errors.storage.keys():
+                    self.fixed_errors.append(self.errors.remove_error(rule.id))
                 continue
             error_verbosity = rule.error_verbosity
-            if error_verbosity not in self.errors:
-                continue
             error_description = rule.error_description
             if function_result_info is not None:
                 error_description = error_description + f' ({function_result_info})'
-            self.errors[error_verbosity].append(error_description)
+            self.errors.add_error(rule.id, error_description, error_verbosity)
 
     def __is_online(self):
         if self.snapshot.active_input is None:
@@ -187,7 +181,7 @@ class VmixState:
         result = input_buses == needed_bus_mapping
         info = '{}: {} required: ({})'.format(
             input_key,
-            ','.join(input_buses),
+            input_buses,
             needed_bus_mapping
         )
         return {

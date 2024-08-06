@@ -32,7 +32,6 @@
         socket.send(JSON.stringify(
           {type: 'watch', payload: {'page': currentPage}}
         ));
-        console.log('Page: ' + currentPage);
         waitTimer = waitSeed;
     };
 

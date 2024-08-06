@@ -3,8 +3,10 @@ test:
   watch: [testkey, multikey, audiokey, timelapse]
   buses: [M, A, B]
   online: [
-    [inputLevelLow, [timelapse, -18, 10], warning],
-    [streaming, [], warning]
+    [external, [], error],
+    [streaming, [], warning],
+    [fullscreen, [], error],
+    [inputBus, [timelapse, MAB], info]
   ]
   offline: [
   ]

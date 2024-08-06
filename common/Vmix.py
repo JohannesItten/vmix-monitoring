@@ -22,6 +22,7 @@ class Vmix:
         self.password = password
         self.rule_name = rule_name
         self.state = None
+        self.new_errors = []
 
         self.id = self.__get_vmix_id()
         self.api_uri = self.__get_vmix_api_uri()
@@ -44,5 +45,18 @@ class Vmix:
         if self.state is None:
             state = VmixState.VmixState(xml_snapshot=xml_snapshot, rules=rules)
             self.state = state
+        previous_errors = self.state.errors.storage.copy()
         self.state.xml_snapshot = xml_snapshot
         self.state.update_state()
+        self.__get_new_errors(previous_errors, self.state.errors.storage)
+
+    def __get_new_errors(self, previous_errors, current_errors):
+        if len(previous_errors) == 0:
+            self.new_errors = list(current_errors.values())
+            return
+        prev_keys = previous_errors.keys()
+        current_keys_set = set(current_errors.keys())
+        new_errors_keys = [x for x in prev_keys if x not in current_keys_set]
+        for key in new_errors_keys:
+            if key in current_keys_set:
+                self.new_errors.append(current_errors[key])

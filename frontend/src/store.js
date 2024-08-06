@@ -12,32 +12,32 @@ function getGlobalPropClass(propState)
     return propState === 'True' ? redClass : defaultClass;
 }
 
-function getInfoCSSClass(verbosity)
+function getInfoCSSClass(level)
 {
-    switch(verbosity)
+    switch(level)
     {
-        case 'parsing':
-        case 'error':
+        case 10:
+        case 3:
             return redClass;
-        case 'warning':
+        case 2:
             return yellowClass;
+        case 1:
+        default:
+            return defaultClass;
     }
-    return null;
 }
 
 function processVmixErrors(state, vmixId, vmixErrors)
 {
-    for (let verbosity in vmixErrors)
+    if (!Array.isArray(vmixErrors) || vmixErrors.length === 0)
     {
-        let errors = vmixErrors[verbosity];
-        if (errors.length === 0) continue;
-        state.vmixes[vmixId].info = errors[0];
-        state.vmixes[vmixId].infoCSSClass = getInfoCSSClass(verbosity);
+        state.vmixes[vmixId].info = null;
+        state.vmixes[vmixId].infoCSSClass = defaultClass;
         return;
     }
-
-    state.vmixes[vmixId].info = null;
-    state.vmixes[vmixId].infoCSSClass = defaultClass;
+    let vmixError = vmixErrors[0]
+    state.vmixes[vmixId].info = vmixError['description'];
+    state.vmixes[vmixId].infoCSSClass = getInfoCSSClass(vmixError['level']);
 }
 
 const store = createStore({
