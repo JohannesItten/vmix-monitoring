@@ -9,7 +9,7 @@
 </template>
 <script setup>
   import store from './store'
-  import {computed, ref, onMounted} from 'vue'
+  import {computed, ref, onMounted, onBeforeMount} from 'vue'
 
   const vmixes = ref({});
   const criticalErrorMessage = ref(null);
@@ -22,8 +22,6 @@
 
   let urlParams = new URLSearchParams(document.location.search);
   const currentPage = urlParams.get('page');
-  const serverURI = urlParams.get('server');
-
   const startSocket = (wsURL, waitTimer, waitSeed, multiplier) => {
     let socket = new WebSocket(wsURL);
 
@@ -63,8 +61,16 @@
   }
 
   onMounted(() => {
+    fetch('/defaults').then((response) => {
+      if (response.ok)
+      {
+        return response.json();
+      }
+    }).then((json) => {
+      let serverURI = json.server;
       startSocket(serverURI, 1000, 1000, 2);
-  })
+    })
+  });
 
   const processInit = (message) => {
     store.commit('init', message.message);

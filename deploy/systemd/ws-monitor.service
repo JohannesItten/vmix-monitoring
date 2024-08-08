@@ -1,0 +1,8 @@
+[Unit]
+Description=vMix monitoring ws server
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/opt/vmix-monitoring/
+ExecStart=/opt/vmix-monitoring/main_websocket.py

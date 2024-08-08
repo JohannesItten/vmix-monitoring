@@ -65,6 +65,7 @@ const store = createStore({
         if (!state.vmixes.hasOwnProperty((vmixId))) return;
         let vmix = state.vmixes[vmixId];
         vmix.info = payload.error.text;
+        vmix.infoCSSClass = redClass;
     },
     updateVmix (state, payload) {
         let vmixId = payload.vmixId;
