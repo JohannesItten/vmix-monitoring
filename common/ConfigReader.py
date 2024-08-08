@@ -31,7 +31,7 @@ def translate_rules(rule_list) -> list:
 
 
 class ConfigReader:
-    CONFIG_DIR = 'config/'
+    CONFIG_DIR = '/home/jitten/code-projects/vmix-monitor/config/'
 
     def __init__(self):
         pass

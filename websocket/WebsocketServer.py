@@ -1,36 +1,29 @@
 import asyncio
+import functools
 import json
+import sys
+
 import websockets
 import os
-import sys
-from signal import signal, SIGINT, SIGTERM
 import common.ConfigReader as ConfigReader
-
-
-def exit_handler(signal_received, frame):
-    print('\nShutting down server...\n')
-    sys.exit(0)
+import signal
+from websocket import wskiller
 
 
 class WebsocketServer:
     def __init__(self,
                  host: str,
                  port: str,
-                 is_global: False,
-                 is_mustdie: False):
+                 is_global: False):
         self.host = host
         self.port = port
         self.is_global = is_global
-        self.is_mustdie = is_mustdie
 
         self.watchers = set()
         self.vmixes_init_info = []
         self.__read_configs()
 
     def run(self):
-        signal(SIGINT, exit_handler)
-        if self.is_mustdie:
-            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
         asyncio.run(self.__main())
 
     async def __watch(self, websocket, watcher_page):
@@ -47,12 +40,13 @@ class WebsocketServer:
         # await asyncio.Event().wait()
 
     async def __broadcast_to_watchers(self, message):
-        # state = json.loads(message)
         websockets.broadcast(self.watchers, message)
 
-    async def __handler(self, websocket):
+    async def __message_handler(self, websocket):
         try:
             message = await websocket.recv()
+            if wskiller.kill_now():
+                sys.exit(0)
             action = json.loads(message)
         except websockets.exceptions.ConnectionClosed:
             print('conn is closed')
@@ -69,12 +63,13 @@ class WebsocketServer:
 
     async def __main(self):
         loop = asyncio.get_running_loop()
-        stop = loop.create_future()
-        if not self.is_mustdie:
-            loop.add_signal_handler(SIGTERM, stop.set_result, None)
-
+        for signal_name in {'SIGTERM', 'SIGINT'}:
+            loop.add_signal_handler(
+                getattr(signal, signal_name),
+                functools.partial(self.__exit_handler, signal_name, loop)
+            )
         port = int(os.environ.get('PORT', self.port))
-        async with websockets.serve(self.__handler, self.host, port):
+        async with websockets.serve(self.__message_handler, self.host, port):
             await asyncio.Future()
 
     def __read_configs(self):
@@ -103,3 +98,8 @@ class WebsocketServer:
         for i in range(page_number * page_amount - page_amount, page_vmixes_max):
             page_vmixes.append(vmixes[i])
         return page_vmixes
+
+    @staticmethod
+    def __exit_handler(signal_name, loop):
+        loop.stop()
+        sys.exit(0)
