@@ -1,4 +1,4 @@
-test:
+standart24:
   recording:
     text: REC
     icon: fa fa-hdd-o
@@ -8,9 +8,26 @@ test:
   master:
     text: M
     icon:
-  busG:
-    text: G
-    icon:
-  audiokey:
-    text: AUDIO
+  ruskey:
+    text: RUS
     icon: fa fa-volume-up
+  engkey:
+    text: ENG
+    icon: fa fa-volume-up
+
+standart24-2:
+  busA:
+    text: A
+    icon:
+  busB:
+    text: B
+    icon:
+  busC:
+    text: C
+    icon:
+  busD:
+    text: D
+    icon:
+  busE:
+    text: E
+    icon:

@@ -1,14 +1,20 @@
-test:
-  idle: [zastkey, shapkakey]
-  watch: [testkey, multikey, audiokey, timelapse]
-  buses: [M, A, B]
+standart24:
+  idle: [zastkey, advkey]
+  watch: [mixkey, ruskey, engkey, vcskey]
   online: [
-    [external, [], error],
-    [streaming, [], warning],
-    [fullscreen, [], error],
-    [inputBus, [timelapse, MAB], info]
+    [streaming, [], error],
+    [inputBus, [mixkey, BC], warning],
+    [inputBus, [vcskey, BC], warning],
+    [inputBus, [ruskey, M], warning],
+    [inputBus, [engkey, M], warning],
+    [/busMuted, [M], error],
+    [/inputMuted, [ruskey], error],
+    [/inputMuted, [engkey], error],
+    [/busLevelLow, [M, -18, 5], warning]
   ]
   offline: [
+    [busMuted, [M], warning]
   ]
   always: [
+    [recording, [], error]
   ]

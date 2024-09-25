@@ -20,6 +20,8 @@ class VmixState:
         # need for checking value changes, during time
         self.check_results = ResultStorage.TimeDepCheckResultStorage()
         self.check_results.add_always_ids(self.rules.always)
+        # need to remove NOT always errors on online state change
+        self.errors.add_always_ids(self.rules.always)
 
     def update_state(self):
         self.__reinit_state()
@@ -27,11 +29,12 @@ class VmixState:
         self.snapshot = parser.parse()
         self.__check_state(self.rules.always)
         current_online_state = self.__is_online()
-        if (current_online_state != self.online and
-                self.online is not None):
+        if (current_online_state != self.online
+                and self.online is not None):
             self.is_online_changed = True
             # stop run time dependent checks on online state change
             self.check_results.reset_except_always()
+            self.errors.reset_except_always()
         self.online = current_online_state
         check_rules = self.rules.online if self.online else self.rules.offline
         self.__check_state(check_rules)

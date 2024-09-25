@@ -4,6 +4,7 @@ from common.check_error import CheckError
 class CheckErrorStorage:
     def __init__(self):
         self.storage = {}
+        self.always_ids = []
 
     def add_error(self, rule_id: str, description: str, level):
         if rule_id in self.storage:
@@ -36,3 +37,14 @@ class CheckErrorStorage:
                                 key=lambda item: item[1].level,
                                 reverse=True)
         self.storage = dict(sorted_storage)
+
+    def add_always_ids(self, user_rules):
+        for rule in user_rules:
+            self.always_ids.append(rule.id)
+
+    def reset_except_always(self):
+        error_keys = list(self.storage.keys())
+        for error_id in error_keys:
+            if error_id in self.always_ids:
+                continue
+            self.storage.pop(error_id)

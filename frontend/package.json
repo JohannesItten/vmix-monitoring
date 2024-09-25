@@ -6,14 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "rm -rf fastapi/vue/ && mkdir fastapi/vue && mv dist/* fastapi/vue/",
+    "postbuild": "rm -rf control-api/vue/ && mkdir control-api/vue && mv dist/* control-api/vue/",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
   },
   "dependencies": {
     "vue": "^3.4.29",
-    "vue-router": "^4.3.3",
+    "vue-router": "^4.4.3",
     "vuex": "^4.0.2"
   },
   "devDependencies": {

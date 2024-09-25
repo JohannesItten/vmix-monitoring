@@ -1,0 +1,61 @@
+html
+{
+  font-family: 'Open Sans', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+  font-size: 0.85em;
+}
+
+body
+{
+    width: 1920px;
+    height: 1080px;
+    min-width: 1920px;
+    min-height: 1080px;
+    max-width: 1920px;
+    max-height: 1080px;
+    margin: 0;
+    padding: 0;
+}
+
+.red
+{
+  background-color: #FF3333 !important;
+}
+
+.green
+{
+  background-color: #00CC33 !important;
+}
+
+.yellow
+{
+  background-color: #FF9900 !important;
+}
+
+.grey
+{
+  background-color: #999999;
+}
+
+.grey-info
+{
+  background-color: #CCCCCC;
+}
+
+nav
+{
+    display: flex;
+    background-color: #CCCCCC;
+    height: 50px;
+    align-items: center;
+}
+
+nav a
+{
+    padding: 10px 10px;
+    justify-content: left;
+    z-index: 10;
+}

@@ -29,7 +29,7 @@ class TimeDepCheckResultStorage:
 
     def add_always_ids(self, user_rules):
         for check in user_rules:
-            check_id = get_result_id(check['function'], check['args'])
+            check_id = get_result_id(check.function, check.args)
             if check_id in self.always_ids:
                 continue
             self.always_ids.append(check_id)

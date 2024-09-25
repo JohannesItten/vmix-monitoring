@@ -68,6 +68,7 @@ class MonitorServer:
         await self.__send_state(vmix_id)
         if vmix.state.is_online_changed:
             await self.__notify_vmix_state_changed(vmix.name, vmix.state.online)
+        # await self.__tmp_fix(vmix.new_errors)
         await self.__notify_errors(vmix.name,
                                    fixed_errors=vmix.state.fixed_errors,
                                    new_errors=vmix.new_errors)
@@ -137,3 +138,18 @@ class MonitorServer:
         is_online_text = 'online' if is_online else 'offline'
         await self.__notify(title=f'{vmix_name}',
                             message=f'{vmix_name} is {is_online_text}')
+
+    async def __tmp_fix(self, errors=None):
+        fix_streaming = False
+        fix_master = False
+        for error in errors:
+            if 'Streaming' in error.description:
+                fix_streaming = True
+                break
+            if 'bus' in error.description:
+                fix_master = True
+        async with aiohttp.ClientSession('http://192.168.10.254:8088') as session:
+            if fix_streaming:
+                await session.get('/api/?Function=StartStreaming')
+            if fix_master:
+                await session.get('/api/?Function=MasterAudioOn')

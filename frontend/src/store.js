@@ -31,7 +31,7 @@ function processVmixErrors(state, vmixId, vmixErrors)
 {
     if (!Array.isArray(vmixErrors) || vmixErrors.length === 0)
     {
-        state.vmixes[vmixId].info = null;
+        state.vmixes[vmixId].info = '';
         state.vmixes[vmixId].infoCSSClass = defaultClass;
         return;
     }

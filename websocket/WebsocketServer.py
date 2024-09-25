@@ -14,10 +14,12 @@ class WebsocketServer:
     def __init__(self,
                  host: str,
                  port: str,
-                 is_global: False):
+                 is_global: bool = False,
+                 is_debug: bool = False):
         self.host = host
         self.port = port
         self.is_global = is_global
+        self.is_debug = is_debug
 
         self.watchers = set()
         self.vmixes_init_info = []
@@ -68,9 +70,17 @@ class WebsocketServer:
                 getattr(signal, signal_name),
                 functools.partial(self.__exit_handler, signal_name, loop)
             )
-        port = int(os.environ.get('PORT', self.port))
-        async with websockets.serve(self.__message_handler, self.host, port):
-            await asyncio.Future()
+        if self.is_debug:
+            port = int(os.environ.get('PORT', self.port))
+            async with websockets.serve(self.__message_handler, self.host, port):
+                await asyncio.Future()
+        else:
+            print('PATH', f"/var/run/{os.environ['SUPERVISOR_PROCESS_NAME']}.sock")
+            async with websockets.unix_serve(
+                    self.__message_handler,
+                    path=f"/var/run/{os.environ['SUPERVISOR_PROCESS_NAME']}.sock"
+            ):
+                await asyncio.Future()
 
     def __read_configs(self):
         reader = ConfigReader.ConfigReader()

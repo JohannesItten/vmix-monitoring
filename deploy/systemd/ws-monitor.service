@@ -4,5 +4,6 @@ After=network.target
 
 [Service]
 User=vmixmon
+Group=vmixmon
 WorkingDirectory=/opt/vmix-monitoring/
 ExecStart=/opt/vmix-monitoring/.env/bin/python /opt/vmix-monitoring/main_websocket.py

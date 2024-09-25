@@ -46,7 +46,7 @@ class ConfigReader:
                 name=name,
                 idle_keys=rule['idle'],
                 inputs_keys=rule['watch'] + rule['idle'],
-                buses=rule['buses'],
+                buses={},
                 online=translate_rules(rule['online']),
                 offline=translate_rules(rule['offline']),
                 always=translate_rules(rule['always'])
