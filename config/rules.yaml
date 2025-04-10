@@ -1,20 +1,15 @@
-standart24:
+nrf-2025:
   idle: [zastkey, advkey]
-  watch: [mixkey, ruskey, engkey, vcskey]
+  watch: [audiokey, titlekey]
   online: [
     [streaming, [], error],
-    [inputBus, [mixkey, BC], warning],
-    [inputBus, [vcskey, BC], warning],
-    [inputBus, [ruskey, M], warning],
-    [inputBus, [engkey, M], warning],
+    [recording, [], error],
     [/busMuted, [M], error],
-    [/inputMuted, [ruskey], error],
-    [/inputMuted, [engkey], error],
+    [/inputMuted, [audiokey], error],
     [/busLevelLow, [M, -18, 5], warning]
   ]
   offline: [
-    [busMuted, [M], warning]
+    [inputMuted, [audiokey], info]
   ]
   always: [
-    [recording, [], error]
   ]

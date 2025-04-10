@@ -21,6 +21,7 @@ class VmixXMLParser:
     BUSES_ROOT_TAG = 'audio'
     INPUTS_ROOT_TAG = 'inputs'
     OVERLAYS_ROOT_TAG = 'overlays'
+    OUTPUTS_ROOT_TAG = 'outputs'
 
     MIX_TAG = 'mix'
     ACTIVE_TAG = 'active'
@@ -47,7 +48,8 @@ class VmixXMLParser:
             buses=self.__get_buses(),
             inputs=self.__get_needed_inputs(),
             overlays=self.__get_used_overlays(),
-            mixes=self.__get_mix_active_input()
+            mixes=self.__get_mix_active_input(),
+            outputs=self.__get_outputs()
         )
 
     # Skip things like dynamic and transitions
@@ -192,3 +194,15 @@ class VmixXMLParser:
                 continue
             active_inputs[mix_number] = self.__get_input(input_number)
         return active_inputs
+
+    #outputs info
+    def __get_outputs(self) -> list:
+        outputs_root = self.__get_nested_root(self.OUTPUTS_ROOT_TAG)
+        if outputs_root is None:
+            return []
+
+        outputs = []
+        for output in outputs_root.getchildren():
+            props = get_element_attributes(output)
+            outputs.append(props)
+        return outputs

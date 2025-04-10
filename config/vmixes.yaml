@@ -1,117 +1,135 @@
 #rule: skip means do not mon this vmix
-vmix-stadart24:
-  name: Зал для презентации
-  unit: Сергеев
-  ip: 192.168.10.254
+vmix-test:
+  name: test-vmix
+  unit: Adam Savage
+  ip: 10.5.1.99
   port: 8088
-  username: admin
-  password: 123
-  rule: standart24
-
-vmix-test2:
-  name: 222
-  unit: Sidorov
-  ip: 127.0.0.1
-  port:
   username:
   password:
-  rule: standart24-2
+  rule: nrf-2025
 
-vmix-test3:
-  name: configtest
-  unit: 333
-  ip: 192.168.10.255
-  port:
+vmix-blue-1:
+  name: Зал 1 (BLUE 1)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
   username:
   password:
-  rule:
-#
-#vmix-test4:
-#  name: 444
-#  unit: Sidorov
-#  ip: 127.0.0.2
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test5:
-#  name: 555
-#  unit: Sidorov
-#  ip: 127.0.0.3
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test6:
-#  name: 666
-#  unit: Sidorov
-#  ip: 127.0.0.4
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test7:
-#  name: 777
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test8:
-#  name: 888
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test9:
-#  name: 999
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test10:
-#  name: 101010
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test11:
-#  name: 111111
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test12:
-#  name: 121212
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
-#
-#vmix-test13:
-#  name: 131313
-#  unit: Sidorov
-#  ip: 127.0.0.5
-#  port:
-#  username:
-#  password:
-#  rule:
+  rule: nrf-2025
+
+vmix-blue-2:
+  name: Зал 2 (BLUE 2)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-blue-3:
+  name: Зал 3 (BLUE 3)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-blue-4:
+  name: Зал 4 (BLUE 4)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-blue-5:
+  name: Зал 5 (BLUE 5)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-green-5:
+  name: Зал 6 (GREEN 5)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-green-6:
+  name: Зал 7 (GREEN 6)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-green-8:
+  name: Зал 8 (GREEN 8)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-green-9:
+  name: Зал 9 (GREEN 9)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+vmix-green-10:
+  name: Зал 10 (GREEN 10)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+
+red-8:
+  name: Зал 11 (RED 8+9)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+  
+red-10:
+  name: Зал 12 (RED 10)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+  
+red-11:
+  name: Зал 13 (RED 11)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025
+  
+lobby:
+  name: Зал 14 (lobby)
+  unit: Adam Savage
+  ip: 127.0.0.2
+  port: 8088
+  username:
+  password:
+  rule: nrf-2025

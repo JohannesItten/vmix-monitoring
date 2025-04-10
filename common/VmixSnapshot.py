@@ -7,13 +7,16 @@ class VmixSnapshot:
                  active_input: VmixInput,
                  inputs: dict,
                  overlays: dict,
-                 mixes: dict):
+                 mixes: dict,
+                 outputs: list
+                 ):
         self.vmix_global = vmix_global
         self.active_input = active_input
         self.buses = buses
         self.inputs = inputs
         self.overlays = overlays
         self.mixes = mixes
+        self.outputs = outputs
 
     def dump(self):
         vmix_global = self.vmix_global.dump()
@@ -39,5 +42,6 @@ class VmixSnapshot:
             'buses': buses,
             'inputs': inputs,
             'overlays': overlays,
-            'mixes': mixes
+            'mixes': mixes,
+            'outputs': self.outputs
         }
